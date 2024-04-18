@@ -18,7 +18,7 @@ This is a web application and as such can work on any mobile devices, desktop, l
 
 ## Authors
 
-- ![Odunaro Samson](https://github.com/De-sam)
-- ![Henry Fasakin](https://github.com/fasakinhenry)
+- [Odunaro Samson](https://github.com/De-sam)
+- [Henry Fasakin](https://github.com/fasakinhenry)
 
 Copyright 2024
