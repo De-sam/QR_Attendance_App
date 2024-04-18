@@ -14,7 +14,7 @@ def signup():
     email = request.form.get('email')
     password = request.form.get('password')
     confirm_password = request.form.get('confirm_password')
-    
+    print(email)
     return render_template('login_signup.html')
 
  
