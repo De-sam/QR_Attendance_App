@@ -10,3 +10,4 @@ def validate_qr():
     """validation"""
 
 
+ time = db.Column(db.DateTime(timezone=True), default=func.now())
