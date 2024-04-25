@@ -27,7 +27,7 @@ def login():
             if check_password_hash(user.password, password):
                 flash('Logged in successfully!', category='success')
                 login_user(user, remember=True)
-                return redirect(url_for('views.home'))
+                return redirect(url_for('views.dashboard'))
             else:
                 flash('Password is incorrect', category='danger')
         else:
@@ -70,8 +70,7 @@ def signup():
             new_user = User(username=username, email=email, password=hashed_password)
             db.session.add(new_user)
             db.session.commit()
-            flash('User created! Signup was successful', category='success')
-            return redirect(url_for('views.home'))
+            flash('Signup was successful! Please login', category='success')
     return render_template('login_signup.html')
 @auth.route('/forgot_password')
 def forgot_password_modal():
@@ -83,4 +82,4 @@ def forgot_password_modal():
 def log_out():
     """This is my logout route"""
     logout_user()
-    return redirect(url_for('auth.login'))
+    return render_template('index.html')

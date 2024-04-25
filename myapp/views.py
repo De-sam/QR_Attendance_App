@@ -5,10 +5,10 @@ views = Blueprint("views", __name__)
 
 @views.route("/")
 @views.route("/home")
-@login_required
 def home():
-    return render_template('dashboard_base.html', name=current_user.username )
+    return render_template('index.html')
 
-@views.route("/org")
-def org():
-    return render_template('org.html')
+@views.route("/dashboard")
+@login_required
+def dashboard():
+    return render_template('dashboard_base.html', name=current_user.username)
