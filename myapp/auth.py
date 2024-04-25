@@ -72,7 +72,6 @@ def signup():
             db.session.commit()
             flash('User created! Signup was successful', category='success')
             return redirect(url_for('views.home'))
-        
     return render_template('login_signup.html')
 @auth.route('/forgot_password')
 def forgot_password_modal():

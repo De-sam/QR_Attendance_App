@@ -11,3 +11,10 @@ def validate_qr():
 
 
  time = db.Column(db.DateTime(timezone=True), default=func.now())
+
+
+
+
+
+client id = 385977314734-4kgeo3op36pqrha7d840p6ldb3bmfp8n.apps.googleusercontent.com
+secret =  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
