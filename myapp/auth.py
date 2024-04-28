@@ -29,7 +29,7 @@ def login():
                 login_user(user, remember=True)
                 return redirect(url_for('views.dashboard'))
             else:
-                flash('Password is incorrect', category='danger')
+                flash('Username,Email or Password is incorrect', category='danger')
         else:
             flash('Username or email does not exist', category='danger')
 
