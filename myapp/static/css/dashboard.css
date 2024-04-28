@@ -70,6 +70,24 @@ body {
 	width: 30px;
 }
 
+.row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start; /* Align items to the top */
+  }
+  
+  .col-md-6 {
+    flex: 0 0 calc(50% - 20px); /* 20px is for margin adjustment */
+    margin-bottom: 20px; /* Adjust vertical space between cards */
+  }
+
+  /* Media query for responsiveness */
+  @media only screen and (max-width: 768px) {
+    .col-md-6 {
+      flex: 0 0 calc(100% - 20px);
+    }
+  }
+
 
 
 /* ================================================= */
@@ -277,7 +295,7 @@ body.sidebar-open #sidebar {
 	border-radius: 8px;
 	height: calc(100vh + 10rem);
 	display: grid;
-	place-content: center;
+	
 }
 
 

@@ -1,5 +1,5 @@
     body, html {
-        background-color: black;
+        background-color: inherit;
         height: 100%;
         width: 100%;
         margin: 0;
@@ -14,37 +14,38 @@
     }
 
     .form-container {
-        background-color:black;
+        background-color:inherit;
         padding: 2rem;
         border: solid 1px grey;
         border-radius: 10px;
         box-shadow: 0 4px 8px grey;
-        color: white;
+        color:inherit;
         width: 460px;
-        height: 600px;
+        height: 650px;
 
     }
     .logo {
         font-size: 2rem;
         font-weight: bold;
         margin-bottom: 1rem;
-        color: white;
+        color:inherit;
         text-align: center;
         padding-bottom: 5px;
     }
     .btn-toggle {
-        color: white;
+        color: inherit;
         border:solid 0.2px;
         padding: 10px 10px;
         margin-bottom: 20px;
         cursor: pointer;
         width: 100px;
-        background-color: black;
+        background-color: inherit;
 
     }
     .btn-toggle.active {
         background-color: red;
         border: solid 0.2px;
+        color: white;
 
     }
     .form-control, .btn-danger, .form-check-input {
