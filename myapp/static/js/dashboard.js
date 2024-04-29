@@ -42,3 +42,25 @@ const switchTheme = () => {
 
 // Add the event listener for the theme switcher
 document.querySelector('#sidebar__theme-switcher').addEventListener('click', switchTheme)
+
+// added functionality for hover effect
+// Get all the menu items
+const menuItems = document.querySelectorAll('.sidebar__menu-item');
+
+// Function to handle menu item selection
+const selectMenuItem = (menuItem) => {
+    // Remove 'active' class from all menu items
+    menuItems.forEach(item => {
+        item.classList.remove('active');
+    });
+
+    // Add 'active' class to the selected menu item
+    menuItem.classList.add('active');
+}
+
+// Add event listener to each menu item
+menuItems.forEach(item => {
+    item.addEventListener('click', () => {
+        selectMenuItem(item);
+    });
+});

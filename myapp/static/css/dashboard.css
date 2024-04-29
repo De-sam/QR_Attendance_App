@@ -65,6 +65,15 @@ body {
 	color: var(--gray-base);
 }
 
+/* adding hover effect */
+
+.sidebar__menu-item.active {
+    background-color: red;
+    color: white; /* Change text color to white */
+    /* Add any other styles for the active menu item */
+}
+
+
 .profile_image{
 	height: 30px;
 	width: 30px;
@@ -167,6 +176,7 @@ body.sidebar-open #toggle-icon-close {
 	flex-direction: column;
 	gap: 4rem;
 	min-height: 100%;
+	z-index: 1000;
 	align-items: flex-start;
 	transform: translate3d(-100%, 0, 0);
 	transition: transform .4s ease-in-out, background-color .4s ease-in-out;
@@ -295,6 +305,7 @@ body.sidebar-open #sidebar {
 	border-radius: 8px;
 	height: calc(100vh + 10rem);
 	display: grid;
+	place-content: ;
 	
 }
 

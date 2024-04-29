@@ -31,6 +31,24 @@
 
 {% block content %}
 
-<h1>Manage Organisations</h1>
+<div class="container mt-5">
+    <h2>Organizations</h2>
+    <table class="table table-bordered">
+        <thead class="thead-dark">
+            <tr>
+                <th>Organization Name</th>
+                <th>Organisation ID</th>
+                <th>Created By</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for organization in organizations %}
+                <tr>
+                    <td>{{ organization.name }}</td>
+                    <td>{{ organization.code }}</td>
+                    <td>{{ organization.creator.username }}</td> <!-- Assuming the User model has a username -->
+                </tr>
+            {% endfor %}
+        
 
  {% endblock %}

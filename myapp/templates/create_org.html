@@ -3,5 +3,14 @@
  
 
 {% block content %}
- <h1> Let's Craete an Organisation </h1>
+<div class="container mt-5">
+    <h2>Create Organization</h2>
+    <form method="POST">
+        <div class="form-group">
+            <label for="name">Organization Name:</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Create Organization</button>
+    </form>
+</div>
  {% endblock %}
