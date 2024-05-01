@@ -22,18 +22,14 @@ def login():
         else:
             user = User.query.filter_by(username=user_input).first()
 
-        if user:
-            # Check if the password is correct
-            if check_password_hash(user.password, password):
-                flash('Logged in successfully!', category='success')
-                login_user(user, remember=True)
-                return redirect(url_for('views.dashboard'))
-            else:
-                flash('Username,Email or Password is incorrect', category='danger')
+        if user and check_password_hash(user.password, password):
+            login_user(user, remember=True)
+            return redirect(url_for('views.dashboard'))
         else:
-            flash('Username or email does not exist', category='danger')
+            flash('Login details are incorrect. Please try again.', category='danger')
 
     return render_template('login_signup.html')
+
 
 @auth.route("/signup", methods=['GET', 'POST'])
 def signup():

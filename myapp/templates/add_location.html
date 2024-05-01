@@ -2,5 +2,76 @@
 {% block title %} add Location {% endblock %}
  
 {% block content %}
-<h1> Add Location</h1>
+<div class="container mt-5">
+    <h5>Add Locations</h5>
+    <form id="organizationForm">
+        <div class="mb-3">
+            <label for="orgName" class="form-label">Organization Name</label>
+            <input type="text" class="form-control" id="orgName" required readonly>
+        </div>
+        <div class="mb-3">
+            <label for="address" class="form-label">Address</label>
+            <input type="text" class="form-control" id="address" required>
+        </div>
+        
+        <div class="mb-3">
+            <label for="alias" class="form-label">Alias</label>
+            <input type="text" class="form-control" id="alias" required>
+        </div>
+
+
+        <div class="mb-3">
+            <label for="longitude" class="form-label">Longitude</label>
+             <input type="text" id="longitudeInput" placeholder="Longitude" class="form-control" required readonly name="longitude">
+        </div>
+
+        <div class="mb-3">
+            <label for="latitude" class="form-label">Latitude</label>
+            <input type="text" id="latitudeInput" placeholder="Latitude" class="form-control" required readonly name="latitude" >
+        </div>
+
+
+
+        <button type="button" class="btn btn-primary" onclick="generateCoordinates()">Generate Coordinates</button>
+        <button type="button" class="btn btn-secondary" onclick="generateQRCode()">Generate QR Code</button>
+
+        <br/>
+
+        <div class="my-3">
+            <label for="qrCode" class="form-label">Qr code</label>
+        <input type="text" id="qrCode" placeholder="Qr code"  name="qrCode" class="form-control" readonly
+        >
+
+        </div>
+
+        <div id="qrCodeDisplay" class="my-3"></div>
+        <button type="submit" class="btn btn-success">Submit</button>
+    </form>
+</div>
+
+<script>
+
+const generateCoordinates = () =>{
+    // Check if geolocation is supported by the browser
+if ("geolocation" in navigator) {
+  navigator.geolocation.getCurrentPosition(function(position) {
+    var latitude = position.coords.latitude;
+    var longitude = position.coords.longitude;
+    
+
+    document.getElementById("longitudeInput").value = longitude;
+    document.getElementById("latitudeInput").value = latitude;
+
+
+  }, function(error) {
+    alert("Error getting user location");
+  });
+} else {
+  alert("Geolocation is not supported by this browser.");
+}
+
+}
+
+</script>
+
  {% endblock %}

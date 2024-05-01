@@ -32,3 +32,8 @@ class Location(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
+    long = db.Column(db.Float, nullable = False)
+    lat = db.Column(db.Float, nullable = False)
+    alias = db.Column(db.String(200), nullable=False)
+    address = db.Column(db.String(200), nullable=False)
+    

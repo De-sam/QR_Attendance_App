@@ -14,6 +14,8 @@ views = Blueprint("views", __name__)
 def home():
     return render_template('index.html')
 
+
+
 @views.route("/dashboard")
 @login_required
 def dashboard():
@@ -23,7 +25,7 @@ def dashboard():
         'dashboard_base.html', 
         name=current_user.username,
         organization_count=organization_count,
-          organizations=organizations
+        organizations=organizations
         )
 
 @views.route("/create_org", methods=['GET', 'POST'])
@@ -39,6 +41,10 @@ def create_org():
             flash('An organization with this name already exists.', category='danger')
             return redirect(url_for('views.create_org'))
 
+        if len(name) < 3:
+            flash('Organization name must be at least 3 characters long.', category='danger')
+            return redirect(url_for('views.create_org'))
+
         if not name:
             flash('Organization name is required.', category='danger')
             return redirect(url_for('create_organization'))
@@ -52,7 +58,7 @@ def create_org():
     return render_template('create_org.html', name=current_user.username)
 
 def generate_organization_code(name):
-    if len(name) < 2:
+    if len(name) < 3:
         raise ValueError("Name must be at least two characters long")
 
     # Extract the first, second, and last characters of the name
@@ -71,7 +77,11 @@ def generate_organization_code(name):
 def manage_org():
 
     organizations = Organization.query.all()
-    return render_template('manage_org.html', organizations=organizations)
+    return render_template(
+        'manage_org.html',
+          organizations=organizations,
+          name=current_user.username
+          )
 
 
 
@@ -84,16 +94,25 @@ def join_org():
 @views.route('/add_location/<int:org_id>')
 def add_location(org_id):
     # Implementation
-    return render_template('add_location.html', org_id=org_id)
+    return render_template(
+        'add_location.html',
+          org_id=org_id,
+          name=current_user.username
+          )
 
 @views.route('/manage_location/<int:org_id>')
 @login_required
 def manage_locations(org_id):
     organization = Organization.query.get_or_404(org_id)
     locations = Location.query.filter_by(organization_id=org_id).all()
-    return render_template('manage_locations.html', organization=organization, locations=locations)
+    return render_template(
+        'manage_locations.html',
+          organization=organization,
+            locations=locations,
+            name=current_user.username
+            )
 
-@views.route('/delete_organization/<int:org_id>', methods=['POST'])
+@views.route('/delete_organization/<int:org_id>', methods=['POST', 'GET' ])
 def delete_organization(org_id):
     organization = Organization.query.get_or_404(org_id)
     locations = Location.query.filter_by(organization_id=org_id).all()
@@ -104,4 +123,4 @@ def delete_organization(org_id):
     db.session.delete(organization)
     db.session.commit()
     flash('Organization and all associated locations deleted successfully!', category='success')
-    return redirect(url_for('manage_org')) 
+    return redirect(url_for('views.manage_org')) 
