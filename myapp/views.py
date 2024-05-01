@@ -40,7 +40,7 @@ def create_org():
             return redirect(url_for('views.create_org'))
 
         if not name:
-            flash('Organization name is required.', 'error')
+            flash('Organization name is required.', category='danger')
             return redirect(url_for('create_organization'))
 
         code = generate_organization_code(name)
@@ -73,8 +73,35 @@ def manage_org():
     organizations = Organization.query.all()
     return render_template('manage_org.html', organizations=organizations)
 
+
+
 @views.route("/join_org")
 @login_required
 def join_org():
     return render_template('join_org.html', name=current_user.username)
 
+
+@views.route('/add_location/<int:org_id>')
+def add_location(org_id):
+    # Implementation
+    return render_template('add_location.html', org_id=org_id)
+
+@views.route('/manage_location/<int:org_id>')
+@login_required
+def manage_locations(org_id):
+    organization = Organization.query.get_or_404(org_id)
+    locations = Location.query.filter_by(organization_id=org_id).all()
+    return render_template('manage_locations.html', organization=organization, locations=locations)
+
+@views.route('/delete_organization/<int:org_id>', methods=['POST'])
+def delete_organization(org_id):
+    organization = Organization.query.get_or_404(org_id)
+    locations = Location.query.filter_by(organization_id=org_id).all()
+
+    for location in locations:
+        db.session.delete(location)
+
+    db.session.delete(organization)
+    db.session.commit()
+    flash('Organization and all associated locations deleted successfully!', category='success')
+    return redirect(url_for('manage_org')) 
