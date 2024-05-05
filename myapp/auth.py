@@ -1,4 +1,4 @@
-from flask import Blueprint
+from flask import Blueprint,session
 from myapp import render_template,request,flash,redirect,url_for
 from . import db
 from .models import User
@@ -78,4 +78,5 @@ def forgot_password_modal():
 def log_out():
     """This is my logout route"""
     logout_user()
+    session.clear()
     return render_template('index.html')

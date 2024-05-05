@@ -31,6 +31,7 @@
 	--sun-icon-fill: var(--gray-tint-30);
 	--moon-icon-fill: var(--extras-white-alpha-64);
 	--main-header-link-color: var(--gray-tint-80);
+	
 }
 
 :root[data-theme="light"] {
@@ -73,6 +74,12 @@ body {
     /* Add any other styles for the active menu item */
 }
 
+.custom-border {
+	border: 1px solid #d3d3d3;
+	padding: 5px;
+	margin: 0;
+
+  }
 
 .profile_image{
 	height: 30px;
@@ -96,8 +103,6 @@ body {
       flex: 0 0 calc(100% - 20px);
     }
   }
-
-
 
 /* ================================================= */
 /* Main header */
