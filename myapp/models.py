@@ -14,18 +14,24 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(150))
     created_at = db.Column(db.DateTime(timezone=True), default=func.now())
-    organizations = db.relationship('Organization', backref=backref('creator', lazy=True), lazy='dynamic', cascade="all, delete-orphan")
+    organizations = db.relationship('Organization', backref=backref('created_by_users', lazy=True), lazy='dynamic', cascade="all, delete-orphan")
 
+    def __repr__(self):
+        return f"User('{self.username}', '{self.email}')"
 
 class Organization(db.Model):
     """Organization model for storing organization details."""
     __tablename__ = 'organizations'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False , unique=True)
+    name = db.Column(db.String(100), nullable=False, unique=True)
     code = db.Column(db.String(20), unique=True, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     locations = db.relationship('Location', backref='organization', lazy=True, cascade="all, delete-orphan")
+    created_by = db.relationship('User', backref=backref('created_organizations', lazy=True), lazy=True)
+
+    def __repr__(self):
+        return f"Organization('{self.name}', '{self.locations}', '{self.code}')"
 
 class Location(db.Model):
     """Location model for storing physical location details."""
@@ -34,11 +40,14 @@ class Location(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
-    longitude = db.Column(db.Float, nullable = False)
-    latitude = db.Column(db.Float, nullable = False)
+    longitude = db.Column(db.Float, nullable=False)
+    latitude = db.Column(db.Float, nullable=False)
     alias = db.Column(db.String(200), nullable=False)
     address = db.Column(db.String(200), nullable=False)
-    qrcode = db.relationship('QRCode', backref='location', uselist=False, cascade="all, delete-orphan")
+    qr_codes = db.relationship('QRCode', backref='location', lazy=True, cascade="all, delete-orphan")
+
+    def __repr__(self):
+        return f"Location('{self.name}', '{self.address}')"
 
 class QRCode(db.Model):
     """QRCode model for storing QR code data related to a location."""
@@ -47,4 +56,30 @@ class QRCode(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     qr_data = db.Column(db.Text, nullable=False)
     location_id = db.Column(db.Integer, db.ForeignKey('locations.id'), nullable=False)
+
+    def __repr__(self):
+        return f"QRCode('{self.qr_data}')"
+    
+class JoinRequest(db.Model):
+    """JoinRequest model for storing user requests to join organisations"""
+    __tablename__ = 'join_requests'
+
+    id = db.Column(db.Integer, primary_key=True)
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    status = db.Column(db.String(20), default='pending')  # pending, approved, rejected
+    location_id = db.Column(db.Integer, db.ForeignKey('locations.id'))
+
+    organization = db.relationship('Organization', backref=db.backref('join_requests', lazy=True))
+    user = db.relationship('User', backref=db.backref('join_requests', lazy=True))
+    location = db.relationship('Location', backref=db.backref('join_requests', lazy=True))
+
+    @property
+    def organization_name(self):
+        return self.organization.name
+
+    @property
+    def user_name(self):
+        return self.user.username
+    
     

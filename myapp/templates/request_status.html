@@ -1,0 +1,49 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}View Join Requests{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h3>Your Join Requests</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Organization Name</th>
+                <th>Location</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for request in join_requests %}
+            <tr>
+                <td>{{ request.organization.name }}</td>
+                <td>{{ request.location.alias if request.location else 'No specific location' }}</td>
+                <td>
+                    <button class="btn {{ 'btn-success' if request.status == 'approved' else 'btn-danger' if request.status == 'declined' else 'btn-info' }}">
+                        {% if request.status == 'approved' %}
+                            Approved 
+                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-check2-circle" viewBox="0 0 16 16">
+                              <path d="M2.5 8a5.5 5.5 0 0 1 8.25-4.764.5.5 0 0 0 .5-.866A6.5 6.5 0 1 0 14.5 8a.5.5 0 0 0-1 0 5.5 5.5 0 1 1-11 0"/>
+                              <path d="M15.354 3.354a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0z"/>
+                            </svg>
+                        {% elif request.status == 'declined' %}
+                            Declined <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-x-circle" viewBox="0 0 16 16">
+                              <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                              <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
+                            </svg>
+                        {% elif request.status == 'pending' %}
+                        <div class="fa-1x">
+                            Pending     
+                            <i class="fas fa-spinner fa-pulse"></i>
+                          </div>                          
+                        {% else %}
+                            {{ request.status|capitalize }}
+                        {% endif %}
+                    </button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -2,6 +2,7 @@ from os import path
 from flask import Flask,render_template,request,redirect,url_for,flash
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 
 
 db = SQLAlchemy()
@@ -12,6 +13,10 @@ def create_app():
     app.config['SECRET_KEY'] = 'helloworld'
     app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{DB_NAME}"
     db.init_app(app)
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    migrate = Migrate(app, db)
+
+
 
     from .views import views
     from .auth import auth

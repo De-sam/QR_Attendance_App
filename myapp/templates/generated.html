@@ -3,16 +3,22 @@
 
 {% block content %}
     {% if qr_image %}
+
     <div class="container">
         <div class="row">
             <h5>QR-code for {{location.name}} {{ location.alias }}</h5>
             <div class="col-4">
                 <div class="passport-size"> 
                     <img src="data:image/png;base64,{{ qr_image }}" alt="Passport Photo" class="img-fluid" style="max-width: 100%; height: auto;">
-                    <a class="btn btn-sm" href="data:image/png;base64,{{ qr_image }}" download="QRCode_{{ location.alias }}.png">Download</a>
+                    <a class="btn btn-sm" href="data:image/png;base64,{{ qr_image }}" download="QRCode_{{ location.alias }}.png">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down-square" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M15 2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1zM0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm8.5 2.5a.5.5 0 0 0-1 0v5.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293z"/>
+                        </svg>
+                        Download
+                    </a>
                 </div>
                 <form method="POST" action="{{ url_for('views.regenerate_qr', location_id=location.id) }}">
-                    <button type="submit" class="btn btn-warning">
+                    <button type="submit" class="btn btn-danger">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
                             <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z"/>
                             <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466"/>
