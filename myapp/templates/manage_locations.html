@@ -11,7 +11,6 @@
             <tr>
               <th>Organisation Name</th>
               <th>Alias/Branch</th>
-              <th>Address</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -20,7 +19,6 @@
             <tr>
               <td>{{ location.name }}</td>
               <td>{{ location.alias }}</td>
-              <td>{{ location.address }}</td>
               <td>
                 <a href="{{ url_for('views.generate_qr', location_id=location.id) }}" class="btn btn-sm btn btn-danger">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-qr-code-scan" viewBox="0 0 16 16">

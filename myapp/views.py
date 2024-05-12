@@ -9,6 +9,8 @@ from io import BytesIO
 import base64
 from PIL import Image, ImageDraw, ImageFont
 from sqlalchemy.orm import joinedload
+from sqlalchemy.exc import IntegrityError
+
 
 views = Blueprint("views", __name__)
 
@@ -24,16 +26,29 @@ def home():
 def dashboard():
     user_id = current_user.id  # Get the current user's ID
 
-    # Fetch organizations along with locations and join requests in a single query
+    # Fetch organizations along with locations and pending join requests in a single query
     organizations = Organization.query.options(
         joinedload(Organization.locations),
-        joinedload(Organization.join_requests)
+        joinedload(Organization.join_requests).joinedload(JoinRequest.location)
     ).filter_by(user_id=user_id).all()
+
+    # Filter join requests to only include pending ones for display in the dashboard
+    pending_join_requests = [request for org in organizations for request in org.join_requests if request.status == 'pending']
+
+     # Only prepare member details if there are locations within these organizations
+    member_details = []
+    if any(org.locations for org in organizations):
+        for org in organizations:
+            for location in org.locations:
+                for member in location.members:
+                    member_details.append({
+                        'name': member.username,
+                        'email': member.email,
+                        'alias': location.alias  # Assuming the 'alias' represents the branch
+                    })
 
     organization_count = len(organizations)
     location_count = sum(len(org.locations) for org in organizations)
-    join_requests = [request for org in organizations for request in org.join_requests]
-
 
     return render_template(
         'dashboard_base.html',
@@ -41,9 +56,11 @@ def dashboard():
         organization_count=organization_count,
         location_count=location_count,
         organizations=organizations,
-        join_requests=join_requests,
+        join_requests=pending_join_requests,
+        member_details=member_details if member_details else None,
         location=Location
     )
+
 
 @views.route("/create_org", methods=['GET', 'POST'])
 @login_required
@@ -146,28 +163,65 @@ def join_request(organization_id):
 @login_required
 def approve_join_request(join_request_id):
     join_request = JoinRequest.query.get_or_404(join_request_id)
+    user = User.query.get(join_request.user_id)
+    location = Location.query.get(join_request.location_id)
+
+    # Check if the user is already associated with the location
+    if user not in location.members:
+        # Associate user with the location if not already associated
+        location.members.append(user)
+        flash('Join request approved and user added to location successfully!', 'success')
+    else:
+        flash('User is already a member of this location.', category='info')
+
+    # Update the status of the join request
     join_request.status = 'approved'
-    db.session.commit()
-    flash('Join request approved successfully!', 'success')
+    
+    # Commit changes to the database
+    try:
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        flash('Failed to approve join request due to a database error.', 'error')
+
     return redirect(url_for('views.dashboard'))
 
 @views.route('/decline_join_request/<int:join_request_id>', methods=['POST'])
 @login_required
 def decline_join_request(join_request_id):
     join_request = JoinRequest.query.get_or_404(join_request_id)
-    db.session.delete(join_request)
+
+    # Update join request status to 'declined' instead of deleting it
+    join_request.status = 'declined'
     db.session.commit()
     flash('Join request declined successfully!', 'success')
     return redirect(url_for('views.dashboard'))
 
+
+@views.route('/delete_join_request/<int:request_id>', methods=['POST'])
+@login_required
+def delete_join_request(request_id):
+    join_request = JoinRequest.query.get_or_404(request_id)
+    
+    # Security check: Ensure that only authorized users can delete the request
+    if join_request.user_id != current_user.id and not current_user.is_admin:
+        flash('You do not have permission to delete this request.', 'danger')
+        return redirect(url_for('views.dashboard'))
+    
+    db.session.delete(join_request)
+    db.session.commit()
+    flash('Join request deleted successfully!', 'success')
+    return redirect(url_for('views.view_join_requests'))
+
 @views.route('/view_join_requests')
 @login_required
 def view_join_requests():
-    user_id = current_user.id  # Get the current user's ID
+    user_id = current_user.id  # Adjust as necessary to target the correct user or admin
 
-    # Fetch join requests with related organization and location
+    # Fetch all join requests with related organization and location
     join_requests = JoinRequest.query.options(
-        joinedload(JoinRequest.organization).joinedload(Organization.locations)
+        joinedload(JoinRequest.organization),
+        joinedload(JoinRequest.location)
     ).filter_by(user_id=user_id).all()
 
     return render_template(

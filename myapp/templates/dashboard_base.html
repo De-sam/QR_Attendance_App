@@ -312,7 +312,7 @@
 		</div> <!-- sidebar -->
 
 		<div id="main-content">
-			<div id="main-content__container">
+			<div id="main-content__container col-md-12 mx-auto">
 				{% block content %}
 				<div class="container mt-5">
 					<div class="row g-3"> <!-- Added g-3 for spacing between cards -->
@@ -400,7 +400,27 @@
 				{% endif %}		  
 			</div>
 		</div>
-																							
+		{% if member_details %}
+        <h3>Members of your organisation</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>User Name</th>
+                    <th>Email</th>
+                    <th>Branch Alias</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for member in member_details %}
+                <tr>
+                    <td>{{ member.name }}</td>
+                    <td>{{ member.email }}</td>
+                    <td>{{ member.alias }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}														
 {% endblock %}
 			</div>
 		</div> <!-- main-content -->		

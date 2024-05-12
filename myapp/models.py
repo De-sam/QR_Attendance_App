@@ -4,6 +4,11 @@ from sqlalchemy.sql import func
 from . import db
 from flask_login import UserMixin
 
+# Association table for the many-to-many relationship between Users and Locations
+user_locations = db.Table('user_locations',
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
+    db.Column('location_id', db.Integer, db.ForeignKey('locations.id'), primary_key=True)
+)
 
 class User(db.Model, UserMixin):
     """User model for storing user details."""
@@ -15,7 +20,8 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(150))
     created_at = db.Column(db.DateTime(timezone=True), default=func.now())
     organizations = db.relationship('Organization', backref=backref('created_by_users', lazy=True), lazy='dynamic', cascade="all, delete-orphan")
-
+    locations = db.relationship('Location', secondary=user_locations, backref=db.backref('members', lazy='dynamic'))
+    
     def __repr__(self):
         return f"User('{self.username}', '{self.email}')"
 
