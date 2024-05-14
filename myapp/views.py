@@ -3,13 +3,17 @@ from flask_login import login_required,current_user
 import uuid
 from myapp import render_template,request,flash,redirect,url_for
 from . import db
-from .models import User,Organization,Location,QRCode,JoinRequest
+from .models import User,Organization,Location,QRCode,JoinRequest,Attendance
 import qrcode
 from io import BytesIO
 import base64
 from PIL import Image, ImageDraw, ImageFont
 from sqlalchemy.orm import joinedload
 from sqlalchemy.exc import IntegrityError
+from geopy.distance import geodesic
+from sqlalchemy.sql import func
+from datetime import datetime, timedelta
+
 
 
 views = Blueprint("views", __name__)
@@ -25,6 +29,7 @@ def home():
 @login_required
 def dashboard():
     user_id = current_user.id  # Get the current user's ID
+    search_query = request.args.get('search', '').strip()
 
     # Fetch organizations along with locations and pending join requests in a single query
     organizations = Organization.query.options(
@@ -41,14 +46,20 @@ def dashboard():
         for org in organizations:
             for location in org.locations:
                 for member in location.members:
-                    member_details.append({
+                     if search_query == '' or search_query.lower() in member.username.lower():
+                        member_details.append({
+                        'id': member.id, 
                         'name': member.username,
                         'email': member.email,
-                        'alias': location.alias  # Assuming the 'alias' represents the branch
+                        'alias': location.alias,
+                        'organization_name': org.name,
+                        'location_id': location.id
                     })
 
     organization_count = len(organizations)
     location_count = sum(len(org.locations) for org in organizations)
+
+    has_results = bool(member_details)
 
     return render_template(
         'dashboard_base.html',
@@ -58,8 +69,25 @@ def dashboard():
         organizations=organizations,
         join_requests=pending_join_requests,
         member_details=member_details if member_details else None,
-        location=Location
+        location=Location,
+        has_results=has_results
     )
+
+
+@views.route('/admin_only/')
+@login_required
+def admin_only_function():
+    if not current_user.is_admin:
+        flash('Unauthorized operation. Admin rights required.', 'danger')
+        return redirect(url_for('views.dashboard'))
+
+    # Proceed with admin-only functionality
+    ...
+
+@views.route("/clock_in", methods=['GET', 'POST'])
+@login_required
+def clock_in():
+    return render_template('clock_in.html', name=current_user.username)
 
 
 @views.route("/create_org", methods=['GET', 'POST'])
@@ -82,6 +110,11 @@ def create_org():
         if not name:
             flash('Organization name is required.', category='danger')
             return redirect(url_for('create_organization'))
+
+        if not current_user.is_admin:
+            current_user.is_admin = True
+            flash('You have been granted admin rights.', category='info')
+        
 
         code = generate_organization_code(name)
         new_org = Organization(name=name, code=code, user_id=user_id)
@@ -197,6 +230,27 @@ def decline_join_request(join_request_id):
     flash('Join request declined successfully!', 'success')
     return redirect(url_for('views.dashboard'))
 
+@views.route('/remove_member/<int:user_id>/<int:location_id>', methods=['POST'])
+@login_required
+def remove_member(user_id, location_id):
+    # Security check to ensure only authorized users can make changes
+    if not current_user.is_admin:
+        flash('Unauthorized operation.', 'danger')
+        return redirect(url_for('views.dashboard'))
+
+    # Get the location and the user based on IDs provided
+    location = Location.query.get_or_404(location_id)
+    user_to_remove = User.query.get_or_404(user_id)
+    
+    # Remove the user from the location
+    if user_to_remove in location.members:
+        location.members.remove(user_to_remove)
+        db.session.commit()
+        flash('Member successfully removed from the location.', 'success')
+    else:
+        flash('Member not found in this location.', 'warning')
+
+    return redirect(url_for('views.dashboard'))
 
 @views.route('/delete_join_request/<int:request_id>', methods=['POST'])
 @login_required
@@ -368,10 +422,22 @@ def generate_qr(location_id):
         qr_data=qr.qr_data,
         qr_image=qr_img_base64,
         location=location,
-        organization=organization
+        organization=organization,
+        name=current_user.username
     )
 
+@views.route('/set_deadline/<int:location_id>', methods=['GET', 'POST'])
+@login_required
+def set_deadline(location_id):
+    location = Location.query.get_or_404(location_id)
+    if request.method == 'POST':
+        deadline_time = request.form.get('deadline')
+        location.deadline = datetime.strptime(deadline_time, '%H:%M').time()
+        db.session.commit()
+        flash('Deadline updated successfully!', 'success')
+        return redirect(url_for('views.set_deadline', location_id=location.id))
 
+    return render_template('set_deadline.html', location=location,name=current_user.username)
 
 @views.route('/regenerate_qr/<int:location_id>', methods=['POST','GET'])
 @login_required
@@ -436,5 +502,137 @@ def regenerate_qr(location_id):
         qr_data=qr.qr_data,
         qr_image=qr_img_base64,
         location=location,
-        organization=organization
+        organization=organization,
+        name=current_user.username
+    )
+
+@views.route('/pre', methods=['GET', 'POST'])
+@login_required
+def pre():
+    # Adjust this to check for clock-in status based on current day
+    today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+    today_end = today_start + timedelta(days=1)
+
+    attendance = Attendance.query.filter(
+        Attendance.user_id == current_user.id,
+        Attendance.clock_in_time >= today_start,
+        Attendance.clock_in_time < today_end
+    ).order_by(Attendance.clock_in_time.desc()).first()
+
+    if attendance and not attendance.clock_out_time:
+        action = "Clock Out"
+        url = url_for('views.clock_in')
+    else:
+        action = "Clock In"
+        url = url_for('views.clock_in')
+
+    return render_template('pre-clockin.html', action=action, url=url)
+
+@views.route('/process_qr_code', methods=['POST', 'GET'])
+@login_required
+def process_qr_code():
+    qr_code_data = request.form.get('qrCodeData')
+    
+    # Check if latitude and longitude data are provided
+    lat_data = request.form.get('latitude')
+    lng_data = request.form.get('longitude')
+    if not lat_data or not lng_data:
+        flash('Please set coordinates.', 'danger')
+        return redirect(url_for('views.dashboard'))
+    
+    try:
+        # Convert latitude and longitude to float
+        lat = float(lat_data)
+        lng = float(lng_data)
+        print(f"Received coordinates: Latitude: {lat}, Longitude: {lng}")
+    except ValueError:
+        flash('Invalid coordinates.', 'danger')
+        return redirect(url_for('views.dashboard'))
+    
+    current_coords = (lat, lng)
+    
+    # Parse and validate QR code data
+    qr_code = QRCode.query.filter_by(qr_data=qr_code_data).first()
+    if not qr_code:
+        flash('QR Code not recognized.', 'danger')
+        return redirect(url_for('views.dashboard'))
+    
+    location = Location.query.get(qr_code.location_id)
+    if not location:
+        flash('No location associated with this QR code.', 'danger')
+        return redirect(url_for('views.dashboard'))
+    
+    print(f"Location coordinates: Latitude: {location.latitude}, Longitude: {location.longitude}")
+    
+    # Check if the current user is associated with the location
+    if current_user not in location.members:
+        flash('You are not authorized to perform this action at this location.', 'danger')
+        return redirect(url_for('views.dashboard'))
+    
+    # Distance validation
+    location_coords = (location.latitude, location.longitude)
+    distance = geodesic(current_coords, location_coords).meters
+    print(f"Calculated distance: {distance} meters")
+    if distance > 100:
+        flash(f'Not within the required range of the location. Distance: {distance:.2f} meters', 'danger')
+        return redirect(url_for('views.dashboard'))
+    
+    now = datetime.now()
+    current_time = now.time()
+    
+    print(f"Current time: {current_time}")
+
+    # Check deadline and set status
+    if location.deadline is None:
+        status = 'Absent'
+    elif current_time <= location.deadline:
+        status = 'Early'
+    else:
+        status = 'Late'
+    
+    # Find if there's an open attendance record
+    attendance = Attendance.query.filter_by(user_id=current_user.id, location_id=location.id, is_clocked_in=True).first()
+    if attendance:
+        attendance.clock_out_time = func.now()
+        attendance.is_clocked_in = False
+        flash('Clock-out successful.', 'success')
+    else:
+        new_attendance = Attendance(
+            user_id=current_user.id,
+            location_id=location.id,
+            clock_in_time=now,
+            is_clocked_in=True,
+            status=status
+        )
+        db.session.add(new_attendance)
+        flash(f'Clock-in successful. You arrived at {now.strftime("%I:%M:%S %p")} ({status}).', 'success')
+    db.session.commit()
+    
+    return redirect(url_for('views.dashboard'))
+
+@views.route('/attendance_log', methods=['GET', 'POST'])
+@login_required
+def attendance_log():
+    organizations = Organization.query.filter_by(user_id=current_user.id).all()
+    selected_org_id = request.args.get('organization_id')
+    selected_location_id = request.args.get('location_id')
+
+    if selected_org_id and selected_location_id:
+        attendances = Attendance.query.join(Location).filter(
+            Attendance.location_id == selected_location_id,
+            Location.organization_id == selected_org_id
+        ).all()
+    elif selected_org_id:
+        attendances = Attendance.query.join(Location).filter(
+            Location.organization_id == selected_org_id
+        ).all()
+    else:
+        attendances = Attendance.query.all()
+
+    return render_template(
+        'attendance_log.html',
+        attendances=attendances,
+        organizations=organizations,
+        selected_org_id=selected_org_id,
+        selected_location_id=selected_location_id
     )

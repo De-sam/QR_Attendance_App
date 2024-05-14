@@ -1,20 +1,36 @@
+import os
 from os import path
 from flask import Flask,render_template,request,redirect,url_for,flash
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from dotenv import load_dotenv
 
 
+load_dotenv()
 db = SQLAlchemy()
-DB_NAME = "database.db"
+
+print("SECRET_KEY:", os.getenv('SECRET_KEY'))
+print("DATABASE_URL:", os.getenv('DATABASE_URL'))
 
 def create_app():
     app = Flask(__name__)
-    app.config['SECRET_KEY'] = 'helloworld'
-    app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{DB_NAME}"
-    db.init_app(app)
+    secret_key = os.getenv('SECRET_KEY')
+    database_url = os.getenv('DATABASE_URL')
+    
+    if not secret_key or not database_url:
+        raise ValueError("No SECRET_KEY or DATABASE_URL set for Flask application")
+    
+    app.config['SECRET_KEY'] = secret_key
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    
+    db.init_app(app)
     migrate = Migrate(app, db)
+   
+    
+   
+    
 
 
 
@@ -24,7 +40,7 @@ def create_app():
     app.register_blueprint(views, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/')
 
-    from .models import User
+    from .models import User, Organization, Location, QRCode, JoinRequest
     
 
     create_database(app)
@@ -40,7 +56,7 @@ def create_app():
     return app
 
 def create_database(app):
-    if not path.exists("myapp/" + DB_NAME):
+    if not path.exists("myapp/"):
         with app.app_context():
             db.create_all()
             print('Created database!')

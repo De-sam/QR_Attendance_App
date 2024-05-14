@@ -1,0 +1,66 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %} Attendance Log {% endblock %}
+
+{% block content %}
+<h1>Attendance Log</h1>
+<div class="container mt-4">
+    <h2>Attendance Records</h2>
+    <form method="get" action="{{ url_for('views.attendance_log') }}">
+        <div class="form-group">
+            <label for="organization">Organization</label>
+            <select id="organization" name="organization_id" class="form-control" onchange="this.form.submit()">
+                <option value="">Select Organization</option>
+                {% for organization in organizations %}
+                <option value="{{ organization.id }}" {% if organization.id|string == selected_org_id %}selected{% endif %}>
+                    {{ organization.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group mt-2">
+            <label for="location">Location</label>
+            <select id="location" name="location_id" class="form-control" onchange="this.form.submit()">
+                <option value="">Select Location</option>
+                {% if selected_org_id %}
+                    {% for organization in organizations %}
+                        {% if organization.id|string == selected_org_id %}
+                            {% for location in organization.locations %}
+                                <option value="{{ location.id }}" {% if location.id|string == selected_location_id %}selected{% endif %}>
+                                    {{ location.alias }}
+                                </option>
+                            {% endfor %}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            </select>
+        </div>
+    </form>
+    <table class="table table-striped mt-4">
+        <thead>
+            <tr>
+                <th scope="col">Date</th>
+                <th scope="col">Name</th>
+                <th scope="col">Time In</th>
+                <th scope="col">Time Out</th>
+                <th scope="col">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for attendance in attendances %}
+            <tr>
+                <td>{{ attendance.clock_in_time.strftime('%d-%m-%Y') }}</td>
+                <td>{{ attendance.user.username }}</td>
+                <td>{{ attendance.clock_in_time.strftime('%I:%M:%S %p') }}</td>
+                <td>{{ attendance.clock_out_time.strftime('%I:%M:%S %p') if attendance.clock_out_time else 'N/A' }}</td>
+                <td>
+                    <button class="btn {{ 'btn-success' if attendance.status == 'Early' else 'btn-danger' if attendance.status == 'Late' else 'btn-secondary' }}">
+                        {{ attendance.status }}
+                    </button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -21,6 +21,7 @@ class User(db.Model, UserMixin):
     created_at = db.Column(db.DateTime(timezone=True), default=func.now())
     organizations = db.relationship('Organization', backref=backref('created_by_users', lazy=True), lazy='dynamic', cascade="all, delete-orphan")
     locations = db.relationship('Location', secondary=user_locations, backref=db.backref('members', lazy='dynamic'))
+    is_admin = db.Column(db.Boolean, default=False, nullable=False)
     
     def __repr__(self):
         return f"User('{self.username}', '{self.email}')"
@@ -51,6 +52,7 @@ class Location(db.Model):
     alias = db.Column(db.String(200), nullable=False)
     address = db.Column(db.String(200), nullable=False)
     qr_codes = db.relationship('QRCode', backref='location', lazy=True, cascade="all, delete-orphan")
+    deadline = db.Column(db.Time, nullable=True)
 
     def __repr__(self):
         return f"Location('{self.name}', '{self.address}')"
@@ -87,5 +89,20 @@ class JoinRequest(db.Model):
     @property
     def user_name(self):
         return self.user.username
-    
+
+class Attendance(db.Model):
+    __tablename__ = 'attendance'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    location_id = db.Column(db.Integer, db.ForeignKey('locations.id'))
+    clock_in_time = db.Column(db.DateTime, nullable=False, default=func.now())
+    clock_out_time = db.Column(db.DateTime)
+    is_clocked_in = db.Column(db.Boolean, default=True)  # True means user has clocked in
+    status = db.Column(db.String(50), default='Absent')
+
+    user = db.relationship('User', backref='attendance_records')
+    location = db.relationship('Location', backref='attendance_records')
+
+    def __repr__(self):
+        return f"<Attendance {self.user.username} {self.location.name} {self.clock_in_time} {self.is_clocked_in}>"
     
