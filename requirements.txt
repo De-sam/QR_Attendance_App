@@ -1,4 +1,3 @@
-gunicorn
 alchemy==20.5
 alembic==1.13.1
 blinker==1.7.0
@@ -34,3 +33,4 @@ SQLAlchemy==2.0.29
 typing_extensions==4.11.0
 urllib3==1.25.11
 Werkzeug==3.0.2
+gunicorn==20.1.0
