@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: my-flask-app
+    env: python
+    buildCommand: "./deploy.sh"
+    startCommand: "gunicorn -b :10000 run:app"  # Adjust according to your specific start needs
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: my-database
+          property: connectionString
+    regions:
+      - regionId: oregon
