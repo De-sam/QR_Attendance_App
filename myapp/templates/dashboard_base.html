@@ -412,33 +412,34 @@
     	<p>No results found.</p>
 		{% else %}				
         {% if member_details %}
-		<table class="table">
-            <thead>
-                <tr>
-                    <th>User Name</th>
-                    <th>Email</th>
-                    <th>Branch Alias</th>
-					<th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for member in member_details %}
-                <tr>
-                    <td>{{ member.name }}</td>
-                    <td>{{ member.email }}</td>
-                    <td>{{ member.organization_name }} ({{ member.alias }})</td>
-					<td>
-						<form action="{{ url_for('views.remove_member', user_id=member.id, location_id=member.location_id) }}" method="POST">
-							<button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?');">Remove</button>
-						</form>
-					</td>
-					
-				</tr>
-                {% endfor %}
-            </tbody>
-        </table>
-       {% endif %}														
-	{% endif %}	
+<div class="table-responsive">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>User Name</th>
+                <th>Email</th>
+                <th>Branch Alias</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for member in member_details %}
+            <tr>
+                <td>{{ member.name }}</td>
+                <td>{{ member.email }}</td>
+                <td>{{ member.organization_name }} ({{ member.alias }})</td>
+                <td>
+                    <form action="{{ url_for('views.remove_member', user_id=member.id, location_id=member.location_id) }}" method="POST">
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?');">Remove</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
 {% endblock %}
 			</div>
 		</div> <!-- main-content -->		
