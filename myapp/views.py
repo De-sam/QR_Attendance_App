@@ -4,7 +4,7 @@ import uuid
 from flask import current_app
 from myapp import render_template,request,flash,redirect,url_for
 from . import db
-from .models import User,Organization,Location,QRCode,JoinRequest,Attendance
+from .models import User,Organization,Location,QRCode,JoinRequest,Attendance,UserTimeZone
 import qrcode
 from io import BytesIO
 import base64
@@ -732,20 +732,35 @@ TIMEZONES = [
 
 
 
-@views.route('/set_timezone', methods=['POST', 'GET'])
+@views.route('/set_timezone', methods=['GET', 'POST'])
 @login_required
 def set_timezone():
     if request.method == 'POST':
         timezone = request.form.get('timezone')
-        session['timezone'] = timezone
-        flash(f'Timezone set to {timezone}', 'success')
+
+        # Validate timezone
+        if timezone not in TIMEZONES:
+            return render_template('settings.html', error='Invalid timezone.', timezones=TIMEZONES)
+
+        # Save timezone to database
+        user_timezone = UserTimeZone(user_id=current_user.id, time_zone=timezone)
+        db.session.add(user_timezone)
+        db.session.commit()
+        flash('Timezone saved successfully.', 'success')
+
+
         return redirect(url_for('views.dashboard'))
-    return render_template('settings.html', timezones=TIMEZONES)
+
+    # Get user's current timezone from database
+    user_timezone = UserTimeZone.query.filter_by(user_id=current_user.id).first()
+
+    return render_template('settings.html', timezones=TIMEZONES, user_timezone=user_timezone)
+
 
 def get_current_time():
-    timezone = session.get('timezone')
-    if timezone:
-        tz = pytz.timezone(timezone)
+    user_timezone = UserTimeZone.query.filter_by(user_id=current_user.id).first()
+    if user_timezone:
+        tz = pytz.timezone(user_timezone.time_zone)
         current_time = datetime.now(tz).strftime('%I:%M:%S %p')
         return current_time
     else:

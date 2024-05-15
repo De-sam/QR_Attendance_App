@@ -22,7 +22,8 @@ class User(db.Model, UserMixin):
     organizations = db.relationship('Organization', backref=backref('created_by_users', lazy=True), lazy='dynamic', cascade="all, delete-orphan")
     locations = db.relationship('Location', secondary=user_locations, backref=db.backref('members', lazy='dynamic'))
     is_admin = db.Column(db.Boolean, default=False, nullable=False)
-    
+    can_update_timezone = db.Column(db.Boolean, default=False, nullable=True)
+
     def __repr__(self):
         return f"User('{self.username}', '{self.email}')"
 
@@ -105,4 +106,12 @@ class Attendance(db.Model):
 
     def __repr__(self):
         return f"<Attendance {self.user.username} {self.location.name} {self.clock_in_time} {self.is_clocked_in}>"
+
+
+class UserTimeZone(db.Model):  
+    __tablename__ = 'usertimezones'    
+   
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    time_zone = db.Column(db.String(50), nullable=False)
     
