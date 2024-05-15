@@ -596,7 +596,7 @@ def process_qr_code():
         return redirect(url_for('views.pre'))    
    
     now = datetime.now()
-    current_time = now.time(timezone.utc)
+    current_time = now.time()
     
     print(f"Current time: {current_time}")
 
