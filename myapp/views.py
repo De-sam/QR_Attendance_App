@@ -10,7 +10,7 @@ import base64
 from PIL import Image, ImageDraw, ImageFont
 from sqlalchemy.orm import joinedload
 from sqlalchemy.exc import IntegrityError
-from geopy.distance import geodesic
+from haversine import haversine, Unit
 from sqlalchemy.sql import func
 from datetime import datetime, timedelta
 
@@ -569,14 +569,14 @@ def process_qr_code():
         flash('You are not authorized to perform this action at this location.', 'danger')
         return redirect(url_for('views.dashboard'))
     
-    # Distance validation
+    # Distance validation using Haversine
     location_coords = (location.latitude, location.longitude)
-    distance = geodesic(current_coords, location_coords).meters
+    distance = haversine(current_coords, location_coords, unit=Unit.METERS)
     print(f"Calculated distance: {distance} meters")
     if distance > 100:
         flash(f'Not within the required range of the location. Distance: {distance:.2f} meters', 'danger')
-        return redirect(url_for('views.dashboard'))
-    
+        return redirect(url_for('views.pre'))    
+   
     now = datetime.now()
     current_time = now.time()
     
