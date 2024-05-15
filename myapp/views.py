@@ -731,7 +731,7 @@ def set_timezone():
         timezone = request.form.get('timezone')
         session['timezone'] = timezone
         flash(f'Timezone set to {timezone}', 'success')
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('views.dashboard'))
     return render_template('settings.html', timezones=TIMEZONES)
 
 def get_current_time():
