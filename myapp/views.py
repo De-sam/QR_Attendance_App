@@ -722,31 +722,29 @@ TIMEZONES = [
     'Pacific/Tahiti', 'Pacific/Tarawa', 'Pacific/Tongatapu', 'Pacific/Wake', 'Pacific/Wallis', 'UTC'
 ]
 
+app = Flask(__name__)
+app.secret_key = 'your_secret_key'  # Replace with a secure secret key
+login_manager = LoginManager()
+login_manager.init_app(app)
 
-@views.route("/set_timezone", methods=['POST','GET'])
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/set_timezone', methods=['POST', 'GET'])
 @login_required
 def set_timezone():
     if request.method == 'POST':
-        global selected_timezone
         timezone = request.form.get('timezone')
         session['timezone'] = timezone
         flash(f'Timezone set to {timezone}', 'success')
-        return redirect(url_for('views.dashboard'))
+        return redirect(url_for('dashboard'))
     return render_template('settings.html', timezones=TIMEZONES)
-def get_current_time():
-    global selected_timezone
-    if selected_timezone:
-        tz = pytz.timezone(selected_timezone)
-        current_time = datetime.now(tz).strftime('%Y-%m-%d %H:%M:%S')
-        return current_time
-    else:
-        return 'Timezone not set.'
-
 
 def get_current_time():
-    global selected_timezone
-    if selected_timezone:
-        tz = pytz.timezone(selected_timezone)
+    timezone = session.get('timezone')
+    if timezone:
+        tz = pytz.timezone(timezone)
         current_time = datetime.now(tz).strftime('%Y-%m-%d %H:%M:%S')
         return current_time
     else:
