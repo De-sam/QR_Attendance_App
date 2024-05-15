@@ -598,6 +598,8 @@ def process_qr_code():
     now = datetime.now()
     current_time = get_current_time()  # Get the current time in the selected timezone
 
+    current_time = datetime.strptime(current_time, '%I:%M:%S %p').time()
+
     
     print(f"Current time: {current_time}")
 
