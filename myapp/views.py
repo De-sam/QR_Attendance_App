@@ -722,16 +722,9 @@ TIMEZONES = [
     'Pacific/Tahiti', 'Pacific/Tarawa', 'Pacific/Tongatapu', 'Pacific/Wake', 'Pacific/Wallis', 'UTC'
 ]
 
-app = Flask(__name__)
-app.secret_key = 'your_secret_key'  # Replace with a secure secret key
-login_manager = LoginManager()
-login_manager.init_app(app)
 
-@app.route('/')
-def index():
-    return render_template('index.html')
 
-@app.route('/set_timezone', methods=['POST', 'GET'])
+@views.route('/set_timezone', methods=['POST', 'GET'])
 @login_required
 def set_timezone():
     if request.method == 'POST':
