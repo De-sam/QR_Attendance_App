@@ -53,6 +53,7 @@
                 <td>{{ attendance.user.username }}</td>
                 <td>{{ attendance.clock_in_time.strftime('%I:%M:%S %p') }}</td>
                 <td>{{ attendance.clock_out_time.strftime('%I:%M:%S %p') if attendance.clock_out_time else 'N/A' }}</td>
+                <td>{{ current_time }}</td>
                 <td>
                     <button class="btn {{ 'btn-success' if attendance.status == 'Early' else 'btn-danger' if attendance.status == 'Late' else 'btn-secondary' }}">
                         {{ attendance.status }}

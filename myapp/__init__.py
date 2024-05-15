@@ -5,7 +5,10 @@ from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from dotenv import load_dotenv
-import psycopg2  
+import psycopg2 
+import pytz
+from datetime import datetime 
+
 
 load_dotenv()
 db = SQLAlchemy()
@@ -24,6 +27,12 @@ def create_app():
     app.config['SECRET_KEY'] = secret_key
     app.config['SQLALCHEMY_DATABASE_URI'] = database_url
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['SESSION_COOKIE_SECURE'] = True
+    app.config['SESSION_COOKIE_SAMESITE'] = 'Strict'
+
+# Set the timezone for the Flask application
+    app.config['TIMEZONE'] = 'UTC'
+
     
     db.init_app(app)
     migrate = Migrate(app, db)

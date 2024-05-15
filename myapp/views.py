@@ -596,7 +596,8 @@ def process_qr_code():
         return redirect(url_for('views.pre'))    
    
     now = datetime.now()
-    current_time = now.time()
+    current_time = get_current_time()  # Get the current time in the selected timezone
+
     
     print(f"Current time: {current_time}")
 
@@ -611,14 +612,14 @@ def process_qr_code():
     # Find if there's an open attendance record
     attendance = Attendance.query.filter_by(user_id=current_user.id, location_id=location.id, is_clocked_in=True).first()
     if attendance:
-        attendance.clock_out_time = func.now()
+        attendance.clock_out_time = get_current_time()
         attendance.is_clocked_in = False
         flash('Clock-out successful.', 'success')
     else:
         new_attendance = Attendance(
             user_id=current_user.id,
             location_id=location.id,
-            clock_in_time=now,
+            clock_in_time=get_current_time(),
             is_clocked_in=True,
             status=status
         )
@@ -647,13 +648,17 @@ def attendance_log():
     else:
         attendances = Attendance.query.all()
 
+    current_time = get_current_time()    
+
     return render_template(
         'attendance_log.html',
         attendances=attendances,
         organizations=organizations,
         selected_org_id=selected_org_id,
-        selected_location_id=selected_location_id
+        selected_location_id=selected_location_id,
+        current_time=current_time   
     )
+
 
 
 TIMEZONES = [
