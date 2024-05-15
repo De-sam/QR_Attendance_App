@@ -588,12 +588,12 @@ def process_qr_code():
         return redirect(url_for('views.dashboard'))
     
     # Distance validation using Haversine
-    location_coords = (location.latitude, location.longitude)
-    distance = haversine(current_coords, location_coords, unit=Unit.METERS)
-    print(f"Calculated distance: {distance} meters")
-    if distance > 500:
-        flash(f'Not within the required range of the location. Distance: {distance:.2f} meters', 'danger')
-        return redirect(url_for('views.pre'))    
+    # location_coords = (location.latitude, location.longitude)
+    # distance = haversine(current_coords, location_coords, unit=Unit.METERS)
+    # print(f"Calculated distance: {distance} meters")
+    # if distance > 500:
+    #     flash(f'Not within the required range of the location. Distance: {distance:.2f} meters', 'danger')
+    #     return redirect(url_for('views.pre'))    
    
     now = datetime.now()
     current_time = get_current_time()  # Get the current time in the selected timezone
