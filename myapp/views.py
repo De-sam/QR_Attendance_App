@@ -612,14 +612,14 @@ def process_qr_code():
     # Find if there's an open attendance record
     attendance = Attendance.query.filter_by(user_id=current_user.id, location_id=location.id, is_clocked_in=True).first()
     if attendance:
-        attendance.clock_out_time = get_current_time()
+        attendance.clock_out_time = func.now()
         attendance.is_clocked_in = False
         flash('Clock-out successful.', 'success')
     else:
         new_attendance = Attendance(
             user_id=current_user.id,
             location_id=location.id,
-            clock_in_time=get_current_time(),
+            clock_in_time=now,
             is_clocked_in=True,
             status=status
         )
@@ -743,7 +743,7 @@ def get_current_time():
     timezone = session.get('timezone')
     if timezone:
         tz = pytz.timezone(timezone)
-        current_time = datetime.now(tz).strftime('%Y-%m-%d %H:%M:%S')
+        current_time = datetime.now(tz).strftime('%I:%M:%S %p')
         return current_time
     else:
         return 'Timezone not set.'
