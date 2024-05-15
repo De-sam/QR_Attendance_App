@@ -1,6 +1,7 @@
-from flask import Blueprint,render_template
+from flask import Blueprint,render_template,session
 from flask_login import login_required,current_user
 import uuid
+from flask import current_app
 from myapp import render_template,request,flash,redirect,url_for
 from . import db
 from .models import User,Organization,Location,QRCode,JoinRequest,Attendance
@@ -12,11 +13,28 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy.exc import IntegrityError
 from haversine import haversine, Unit
 from sqlalchemy.sql import func
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+
 
 
 
 views = Blueprint("views", __name__)
+
+@views.before_request
+def before_request():
+    session.permanent = True
+    session.modified = True
+    permanent_session_lifetime = current_app.config['PERMANENT_SESSION_LIFETIME']
+    if 'last_activity' in session:
+        now = datetime.now(timezone.utc)
+        last_activity = session['last_activity']
+        session['last_activity'] = now
+        if now - last_activity > permanent_session_lifetime:
+            flash('Session timed out due to inactivity.', 'warning')
+            return redirect(url_for('auth.logout'))
+    else:
+        session['last_activity'] = datetime.now(timezone.utc)
+
 
 @views.route("/")
 @views.route("/home")
@@ -578,7 +596,7 @@ def process_qr_code():
         return redirect(url_for('views.pre'))    
    
     now = datetime.now()
-    current_time = now.time()
+    current_time = now.time(timezone.utc)
     
     print(f"Current time: {current_time}")
 

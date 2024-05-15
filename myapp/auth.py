@@ -1,13 +1,12 @@
-from flask import Blueprint,session
-from myapp import render_template,request,flash,redirect,url_for
+from flask import Blueprint, session, render_template, request, flash, redirect, url_for
 from . import db
 from .models import User
-from flask_login import login_user,logout_user,login_required,current_user
+from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 import re
+from datetime import datetime, timedelta
 
 auth = Blueprint("auth", __name__)
-
 
 @auth.route("/login", methods=['GET', 'POST'])
 def login():
@@ -24,12 +23,13 @@ def login():
 
         if user and check_password_hash(user.password, password):
             login_user(user, remember=True)
+            session.permanent = True
+            session['last_activity'] = datetime.now()
             return redirect(url_for('views.dashboard'))
         else:
             flash('Login details are incorrect. Please try again.', category='danger')
 
     return render_template('login_signup.html')
-
 
 @auth.route("/signup", methods=['GET', 'POST'])
 def signup():
@@ -68,6 +68,7 @@ def signup():
             db.session.commit()
             flash('Signup was successful! Please login', category='success')
     return render_template('login_signup.html')
+
 @auth.route('/forgot_password')
 def forgot_password_modal():
     """This is the home route"""
@@ -79,4 +80,5 @@ def log_out():
     """This is my logout route"""
     logout_user()
     session.clear()
-    return render_template('index.html')
+    flash('Logged out successfully!', 'success')
+    return redirect(url_for('auth.login'))
