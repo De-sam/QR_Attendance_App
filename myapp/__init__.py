@@ -31,7 +31,7 @@ def create_app():
     app.config['SESSION_COOKIE_SAMESITE'] = 'Strict'
 
 # Set the timezone for the Flask application
-    app.config['TIMEZONE'] = 'UTC'
+    app.config['TIMEZONE'] = 'Africa/Lagos'
 
     
     db.init_app(app)

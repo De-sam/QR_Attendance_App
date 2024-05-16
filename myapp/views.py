@@ -739,7 +739,7 @@ def set_timezone():
         timezone = request.form.get('timezone')
 
         # Validate timezone
-        flash('No such time zone.', 'warning')
+        
         if timezone not in TIMEZONES:
             return render_template('settings.html', timezones=TIMEZONES)
 
