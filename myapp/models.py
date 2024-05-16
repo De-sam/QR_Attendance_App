@@ -3,6 +3,8 @@ from sqlalchemy.orm import backref
 from sqlalchemy.sql import func
 from . import db
 from flask_login import UserMixin
+import pytz
+from datetime import datetime
 
 # Association table for the many-to-many relationship between Users and Locations
 user_locations = db.Table('user_locations',
@@ -23,9 +25,23 @@ class User(db.Model, UserMixin):
     locations = db.relationship('Location', secondary=user_locations, backref=db.backref('members', lazy='dynamic'))
     is_admin = db.Column(db.Boolean, default=False, nullable=False)
     can_update_timezone = db.Column(db.Boolean, default=False, nullable=True)
+    timezone = db.Column(db.String(50), nullable=True, default='UTC')  # Added timezone field with default value
+
+    def set_timezone(self, timezone):
+        """Set the user's timezone, ensuring it is valid."""
+        if timezone in pytz.all_timezones:
+            self.timezone = timezone
+        else:
+            raise ValueError("Invalid timezone")
+
+    def get_current_time_in_timezone(self):
+        """Return the current time in the user's timezone."""
+        return datetime.now(pytz.timezone(self.timezone))
 
     def __repr__(self):
-        return f"User('{self.username}', '{self.email}')"
+        return f"User('{self.username}', '{self.email}', '{self.timezone}')"
+
+  
 
 class Organization(db.Model):
     """Organization model for storing organization details."""
@@ -107,11 +123,4 @@ class Attendance(db.Model):
     def __repr__(self):
         return f"<Attendance {self.user.username} {self.location.name} {self.clock_in_time} {self.is_clocked_in}>"
 
-
-class UserTimeZone(db.Model):  
-    __tablename__ = 'usertimezones'    
-   
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    time_zone = db.Column(db.String(50), nullable=False)
     

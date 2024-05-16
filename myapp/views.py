@@ -4,7 +4,7 @@ import uuid
 from flask import current_app
 from myapp import render_template,request,flash,redirect,url_for
 from . import db
-from .models import User,Organization,Location,QRCode,JoinRequest,Attendance,UserTimeZone
+from .models import User,Organization,Location,QRCode,JoinRequest,Attendance
 import qrcode
 from io import BytesIO
 import base64
