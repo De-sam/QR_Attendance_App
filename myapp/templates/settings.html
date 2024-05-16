@@ -8,7 +8,7 @@
             <label for="timezone" class="form-label">Select Timezone:</label>
             <select class="form-select" id="timezone" name="timezone" required>
                 {% for tz in timezones %}
-                <option value="{{ tz }}">{{ tz }}</option>
+                <option value="{{ tz }}" {% if user_timezone == tz %}selected{% endif %}>{{ tz }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -19,5 +19,6 @@
             Set Timezone
         </button>
     </form>
+    <p>Current timezone: {{ user_timezone }}</p>
 </div>
 {% endblock %}

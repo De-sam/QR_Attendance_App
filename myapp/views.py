@@ -651,7 +651,7 @@ def attendance_log():
     else:
         attendances = Attendance.query.all()
 
-    current_time = get_current_time()    
+    current_time = current_user.get_current_time_in_timezone()    
 
     return render_template(
         'attendance_log.html',
@@ -659,7 +659,7 @@ def attendance_log():
         organizations=organizations,
         selected_org_id=selected_org_id,
         selected_location_id=selected_location_id,
-        current_time=current_time   
+         current_time=current_time.strftime('%Y-%m-%d %I:%M:%S %p %Z')  
     )
 
 
@@ -739,30 +739,24 @@ def set_timezone():
         timezone = request.form.get('timezone')
 
         # Validate timezone
-        
         if timezone not in TIMEZONES:
-            return render_template('settings.html', timezones=TIMEZONES)
+            flash('Invalid timezone selected.', 'danger')
+            return render_template('settings.html', timezones=TIMEZONES, user_timezone=current_user.timezone)
 
-        # Save timezone to database
-        user_timezone = UserTimeZone(user_id=current_user.id, time_zone=timezone)
-        db.session.add(user_timezone)
+        # Save timezone to the user's profile
+        current_user.set_timezone(timezone)
         db.session.commit()
         flash('Timezone saved successfully.', 'success')
 
-
         return redirect(url_for('views.dashboard'))
 
-    # Get user's current timezone from database
-    user_timezone = UserTimeZone.query.filter_by(user_id=current_user.id).first()
+    # Get user's current timezone
+    user_timezone = current_user.timezone
 
     return render_template('settings.html', timezones=TIMEZONES, user_timezone=user_timezone)
 
 
 def get_current_time():
-    user_timezone = UserTimeZone.query.filter_by(user_id=current_user.id).first()
-    if user_timezone:
-        tz = pytz.timezone(user_timezone.time_zone)
-        current_time = datetime.now(tz).strftime('%I:%M:%S %p')
-        return current_time
-    else:
-        return 'Timezone not set.'
+    tz = pytz.timezone(current_user.timezone)
+    current_time = datetime.now(tz).strftime('%I:%M:%S %p')
+    return current_time
