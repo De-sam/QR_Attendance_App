@@ -587,47 +587,42 @@ def process_qr_code():
         flash('You are not authorized to perform this action at this location.', 'danger')
         return redirect(url_for('views.dashboard'))
     
-    # Distance validation using Haversine
-    # location_coords = (location.latitude, location.longitude)
-    # distance = haversine(current_coords, location_coords, unit=Unit.METERS)
-    # print(f"Calculated distance: {distance} meters")
-    # if distance > 500:
-    #     flash(f'Not within the required range of the location. Distance: {distance:.2f} meters', 'danger')
-    #     return redirect(url_for('views.pre'))    
-   
-    now = datetime.now()
-    current_time = get_current_time()  # Get the current time in the selected timezonecurrent_time = datetime.strptime(current_time, '%I:%M:%S %p').time()
+    # Get the user's timezone
+    user_timezone = UserTimeZone.query.filter_by(user_id=current_user.id).first()
+    if user_timezone:
+        tz = pytz.timezone(user_timezone.time_zone)
+    else:
+        tz = pytz.utc
 
-
-    current_time = datetime.strptime(current_time, '%I:%M:%S %p').time()
-
-    
-    print(f"Current time: {current_time}")
+    current_time = datetime.now(tz)
+    print(f"Current time in user's timezone: {current_time}")
 
     # Check deadline and set status
-    if location.deadline is None:
-        status = 'Absent'
-    elif current_time <= location.deadline:
-        status = 'Early'
+    if location.deadline:
+        deadline_time = location.deadline.astimezone(tz).time()
+        if current_time.time() <= deadline_time:
+            status = 'Early'
+        else:
+            status = 'Late'
     else:
-        status = 'Late'
+        status = 'Absent'
     
     # Find if there's an open attendance record
     attendance = Attendance.query.filter_by(user_id=current_user.id, location_id=location.id, is_clocked_in=True).first()
     if attendance:
-        attendance.clock_out_time = func.now()
+        attendance.clock_out_time = current_time
         attendance.is_clocked_in = False
         flash('Clock-out successful.', 'success')
     else:
         new_attendance = Attendance(
             user_id=current_user.id,
             location_id=location.id,
-            clock_in_time=now,
+            clock_in_time=current_time,
             is_clocked_in=True,
             status=status
         )
         db.session.add(new_attendance)
-        flash(f'Clock-in successful. You arrived at {now.strftime("%I:%M:%S %p")} ({status}).', 'success')
+        flash(f'Clock-in successful. You arrived at {current_time.strftime("%I:%M:%S %p %Z")} ({status}).', 'success')
     db.session.commit()
     
     return redirect(url_for('views.dashboard'))
@@ -659,7 +654,7 @@ def attendance_log():
         organizations=organizations,
         selected_org_id=selected_org_id,
         selected_location_id=selected_location_id,
-         current_time=current_time.strftime('%Y-%m-%d %I:%M:%S %p %Z')  
+        current_time=current_time.strftime('%Y-%m-%d %I:%M:%S %p %Z')  
     )
 
 
