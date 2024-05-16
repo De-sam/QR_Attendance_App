@@ -739,8 +739,9 @@ def set_timezone():
         timezone = request.form.get('timezone')
 
         # Validate timezone
+        flash('No such time zone.', 'warning')
         if timezone not in TIMEZONES:
-            return render_template('settings.html', error='Invalid timezone.', timezones=TIMEZONES)
+            return render_template('settings.html', timezones=TIMEZONES)
 
         # Save timezone to database
         user_timezone = UserTimeZone(user_id=current_user.id, time_zone=timezone)
