@@ -605,14 +605,12 @@ def process_qr_code():
     #     return redirect(url_for('views.pre')
 
     # Check deadline and set status
-    if location.deadline:
-        # Check deadline and set status
-        if location.deadline is None:
-            status = 'Absent'
-        elif c_time <= location.deadline:
-            status = 'Early'
-        else:
-            status = 'Late'
+    if location.deadline is None:
+        status = 'Absent'
+    elif c_time <= location.deadline:
+        status = 'Early'
+    else:
+        status = 'Late'
 
     
     if current_user.timezone:
