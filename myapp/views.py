@@ -673,17 +673,10 @@ def attendance_log():
     else:
         attendances = Attendance.query.all()
 
-    if not selected_org_id and not selected_location_id:
-        # No organization selected, so no attendance records to display
-        return render_template('attendance_log.html',
-                               organizations=organizations,
-                               selected_org_id=selected_org_id,
-                               selected_location_id=selected_location_id,
-                               attendances=attendances,
-                               name=current_user.username
-                               )
+     # Get user's current timezone
+    user_timezone = current_user.timezone    
 
-
+    
     if current_user.timezone:
         tz = pytz.timezone(current_user.timezone)
         current_time = datetime.now(tz)
@@ -696,6 +689,19 @@ def attendance_log():
     else:
         user_tz = pytz.utc
 
+    if not selected_org_id and not selected_location_id:
+        # No organization selected, so no attendance records to display
+        return render_template('attendance_log.html',
+                               organizations=organizations,
+                               selected_org_id=selected_org_id,
+                               selected_location_id=selected_location_id,
+                               attendances=attendances,
+                               name=current_user.username,
+                               timezone= user_timezone,
+                               current_date=current_time.strftime('%d-%m-%Y'),
+                               current_time=current_time.strftime('%I:%M:%S %p %Z')
+                               )
+
     # Convert attendance times to user's local timezone
     if attendances:
         for attendance in attendances:
@@ -704,8 +710,7 @@ def attendance_log():
                 attendance.clock_out_time = attendance.clock_out_time.astimezone(user_tz)
 
     
-        # Get user's current timezone
-        user_timezone = current_user.timezone
+       
 
 
 
@@ -715,8 +720,9 @@ def attendance_log():
         organizations=organizations,
         selected_org_id=selected_org_id,
         selected_location_id=selected_location_id,
-        current_time=current_time.strftime('%Y-%m-%d %I:%M:%S %p %Z'),
         name=current_user.username,
+        current_date=current_time.strftime('%d-%m-%Y'),
+        current_time=current_time.strftime('%I:%M:%S %p %Z'),
         timezone= user_timezone
     )
 
