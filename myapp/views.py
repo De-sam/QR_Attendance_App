@@ -588,9 +588,8 @@ def process_qr_code():
         return redirect(url_for('views.dashboard'))
     
     # Get the user's timezone
-    user_timezone = UserTimeZone.query.filter_by(user_id=current_user.id).first()
-    if user_timezone:
-        tz = pytz.timezone(user_timezone.time_zone)
+    if current_user.timezone:
+        tz = pytz.timezone(current_user.timezone)
     else:
         tz = pytz.utc
 
@@ -607,12 +606,20 @@ def process_qr_code():
     else:
         status = 'Absent'
     
+    if current_user.timezone:
+        tz = pytz.timezone(current_user.timezone)
+        c_time = datetime.now(tz)
+    else:
+        c_time = datetime.now(pytz.utc)
+
+    
+
     # Find if there's an open attendance record
     attendance = Attendance.query.filter_by(user_id=current_user.id, location_id=location.id, is_clocked_in=True).first()
     if attendance:
         attendance.clock_out_time = current_time
         attendance.is_clocked_in = False
-        flash('Clock-out successful.', 'success')
+        flash(f'Clock-out at {current_time.strftime("%I:%M:%S %p %Z")} successfully.', 'success')
     else:
         new_attendance = Attendance(
             user_id=current_user.id,
@@ -646,7 +653,24 @@ def attendance_log():
     else:
         attendances = Attendance.query.all()
 
-    current_time = current_user.get_current_time_in_timezone()    
+    if current_user.timezone:
+        tz = pytz.timezone(current_user.timezone)
+        current_time = datetime.now(tz)
+    else:
+        current_time = datetime.now(pytz.utc)
+
+    user_timezone = current_user.timezone
+    if user_timezone:
+        user_tz = pytz.timezone(user_timezone)
+    else:
+        user_tz = pytz.utc
+
+    # Convert attendance times to user's local timezone
+    if attendances:
+        for attendance in attendances:
+            attendance.clock_in_time = attendance.clock_in_time.astimezone(user_tz)
+            if attendance.clock_out_time:
+                attendance.clock_out_time = attendance.clock_out_time.astimezone(user_tz)
 
     return render_template(
         'attendance_log.html',
@@ -654,7 +678,7 @@ def attendance_log():
         organizations=organizations,
         selected_org_id=selected_org_id,
         selected_location_id=selected_location_id,
-        current_time=current_time.strftime('%Y-%m-%d %I:%M:%S %p %Z')  
+        current_time=current_time.strftime('%Y-%m-%d %I:%M:%S %p %Z')
     )
 
 
@@ -750,8 +774,26 @@ def set_timezone():
 
     return render_template('settings.html', timezones=TIMEZONES, user_timezone=user_timezone)
 
+from datetime import datetime
+import pytz
+from flask_login import current_user
 
 def get_current_time():
-    tz = pytz.timezone(current_user.timezone)
-    current_time = datetime.now(tz).strftime('%I:%M:%S %p')
+    # Check if the user has a timezone set
+    if current_user.timezone:
+        # Get the user's timezone
+        user_tz = pytz.timezone(current_user.timezone)
+        
+        # Get the current time in UTC
+        utc_time = datetime.utcnow().replace(tzinfo=pytz.utc)
+        
+        # Convert UTC time to the user's timezone
+        local_time = utc_time.astimezone(user_tz)
+        
+        # Format the time as needed
+        current_time = local_time.strftime('%I:%M:%S %p')
+    else:
+        # Default to UTC time if no timezone is set
+        current_time = datetime.now(pytz.utc).strftime('%I:%M:%S %p')
+    
     return current_time
