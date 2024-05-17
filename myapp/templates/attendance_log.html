@@ -5,8 +5,8 @@
 <div class="container-fluid">
   <div class="card border border-info text-white w-100">
     <div class="card-body">
-      <p class="card-text fs-6 fs-md-5">YOUR CURRENT TIME ZONE IS SET TO: {{ timezone }}</p>
-      <p class="card-text fs-6 fs-md-5">YOUR LOCAL TIME IS: {{ current_time }}</p>
+      <p class="card-text fs-6 fs-md-5">TIME ZONE: {{ timezone }}</p>
+      <p class="card-text fs-6 fs-md-5">LOCAL TIME: {{ current_time }}</p>
       <p class="card-text fs-6 fs-md-5">TODAY'S DATE: {{ current_date }}</p>        
       <a href="{{ url_for('views.set_timezone') }}" class="btn btn-sm btn-outline-info">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
