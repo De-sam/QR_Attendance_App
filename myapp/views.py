@@ -596,13 +596,17 @@ def process_qr_code():
     current_time = datetime.now(tz)
     print(f"Current time in user's timezone: {current_time}")
 
-    # Check deadline and set status
+     # Check deadline and set status
     if location.deadline:
-        deadline_time = location.deadline.astimezone(tz).time()
-        if current_time.time() <= deadline_time:
-            status = 'Early'
+        # Ensure location.deadline is a datetime object with date and time
+        if isinstance(location.deadline, datetime):
+            deadline_time = location.deadline.astimezone(tz).time()
+            if current_time.time() <= deadline_time:
+                status = 'Early'
+            else:
+                status = 'Late'
         else:
-            status = 'Late'
+            status = 'Absent'
     else:
         status = 'Absent'
     
@@ -774,9 +778,7 @@ def set_timezone():
 
     return render_template('settings.html', timezones=TIMEZONES, user_timezone=user_timezone)
 
-from datetime import datetime
-import pytz
-from flask_login import current_user
+
 
 def get_current_time():
     # Check if the user has a timezone set
