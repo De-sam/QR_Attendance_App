@@ -1,5 +1,4 @@
 {% extends "dashboard_base.html" %}
-
 {% block title %} Attendance Log {% endblock %}
 
 {% block content %}
@@ -9,7 +8,7 @@
     <form method="get" action="{{ url_for('views.attendance_log') }}">
         <div class="form-group">
             <label for="organization">Organization</label>
-            <select id="organization" name="organization_id" class="form-control" onchange="handleOrganizationChange()">
+            <select id="organization" name="organization_id" class="form-control" onchange="this.form.submit()">
                 <option value="">Select Organization</option>
                 {% for organization in organizations %}
                 <option value="{{ organization.id }}" {% if organization.id|string == selected_org_id %}selected{% endif %}>
@@ -18,7 +17,7 @@
                 {% endfor %}
             </select>
         </div>
-        <div class="form-group mt-2" id="location-group" style="display:none;">
+        <div class="form-group mt-2">
             <label for="location">Location</label>
             <select id="location" name="location_id" class="form-control" onchange="this.form.submit()">
                 <option value="">Select Location</option>
@@ -36,7 +35,6 @@
             </select>
         </div>
     </form>
-    {% if selected_org_id %}
     <table class="table table-striped mt-4">
         <thead>
             <tr>
@@ -56,28 +54,13 @@
                 <td>{{ attendance.clock_out_time.strftime('%I:%M:%S %p') if attendance.clock_out_time else 'N/A' }}</td>
                 <td>{{ current_time }}</td>
                 <td>
-                    <button class="btn {{ 'btn-success' if attendance.status == 'Early' else 'btn-danger' if attendance.status == 'Late' else 'btn-secondary' }}">
-                        {{ attendance.status }}
-                    </button>
+                <button class="btn {{ 'btn-success' if attendance.status == 'Early' else 'btn-danger' if attendance.status == 'Late' else 'btn-secondary' }}">
+                    {{ attendance.status }}
+                </button>
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
-    {% endif %}
 </div>
-
-<script>
-    function handleOrganizationChange() {
-        var orgSelect = document.getElementById("organization");
-        var locSelect = document.getElementById("location-group");
-
-        if (orgSelect.value !== "") {
-            locSelect.style.display = "block";
-        } else {
-            locSelect.style.display = "none";
-        }
-    }
-</script>
-
 {% endblock %}
