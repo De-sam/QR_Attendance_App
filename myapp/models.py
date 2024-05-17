@@ -25,7 +25,7 @@ class User(db.Model, UserMixin):
     locations = db.relationship('Location', secondary=user_locations, backref=db.backref('members', lazy='dynamic'))
     is_admin = db.Column(db.Boolean, default=False, nullable=False)
     can_update_timezone = db.Column(db.Boolean, default=False, nullable=True)
-    timezone = db.Column(db.String(50), nullable=True, default='UTC')  # Added timezone field with default value
+    timezone = db.Column(db.String(50), nullable=False, default='UTC')  # Added timezone field with default value
 
     def set_timezone(self, timezone):
         """Set the user's timezone, ensuring it is valid."""
@@ -69,7 +69,7 @@ class Location(db.Model):
     alias = db.Column(db.String(200), nullable=False)
     address = db.Column(db.String(200), nullable=False)
     qr_codes = db.relationship('QRCode', backref='location', lazy=True, cascade="all, delete-orphan")
-    deadline = db.Column(db.Time, nullable=True)
+    deadline = db.Column(db.Time, nullable=False)
 
     def __repr__(self):
         return f"Location('{self.name}', '{self.address}')"

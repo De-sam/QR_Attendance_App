@@ -596,11 +596,19 @@ def process_qr_code():
     current_time = datetime.now(tz)
     print(f"Current time in user's timezone: {current_time}")
 
+    # Distance validation using Haversine
+    # location_coords = (location.latitude, location.longitude)
+    # distance = haversine(current_coords, location_coords, unit=Unit.METERS)
+    # print(f"Calculated distance: {distance} meters")
+    # if distance > 500:
+    #     flash(f'Not within the required range of the location. Distance: {distance:.2f} meters', 'danger')
+    #     return redirect(url_for('views.pre')
+
      # Check deadline and set status
     if location.deadline:
         # Ensure location.deadline is a datetime object with date and time
         if isinstance(location.deadline, datetime):
-            deadline_time = location.deadline.astimezone(tz).time()
+            deadline_time = location.deadline
             if current_time.time() <= deadline_time:
                 status = 'Early'
             else:
