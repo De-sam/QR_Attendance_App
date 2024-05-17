@@ -608,7 +608,7 @@ def process_qr_code():
         else:
             status = 'Absent'
     else:
-        status = 'Absent'
+        status = 'Deadline not set'
     
     if current_user.timezone:
         tz = pytz.timezone(current_user.timezone)
