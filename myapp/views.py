@@ -604,12 +604,12 @@ def process_qr_code():
     #     flash(f'Not within the required range of the location. Distance: {distance:.2f} meters', 'danger')
     #     return redirect(url_for('views.pre')
 
-     # Check deadline and set status
+    # Check deadline and set status
     if location.deadline:
         # Ensure location.deadline is a datetime object with date and time
         if isinstance(location.deadline, datetime):
             deadline_time = location.deadline
-            if current_time.time() <= deadline_time:
+            if current_time<= deadline_time:
                 status = 'Early'
             else:
                 status = 'Late'
