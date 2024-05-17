@@ -9,7 +9,7 @@
     <form method="get" action="{{ url_for('views.attendance_log') }}">
         <div class="form-group">
             <label for="organization">Organization</label>
-            <select id="organization" name="organization_id" class="form-control" onchange="this.form.submit()">
+            <select id="organization" name="organization_id" class="form-control" onchange="handleOrganizationChange()">
                 <option value="">Select Organization</option>
                 {% for organization in organizations %}
                 <option value="{{ organization.id }}" {% if organization.id|string == selected_org_id %}selected{% endif %}>
@@ -18,7 +18,7 @@
                 {% endfor %}
             </select>
         </div>
-        <div class="form-group mt-2">
+        <div class="form-group mt-2" id="location-group" style="display:none;">
             <label for="location">Location</label>
             <select id="location" name="location_id" class="form-control" onchange="this.form.submit()">
                 <option value="">Select Location</option>
@@ -64,4 +64,18 @@
         </tbody>
     </table>
 </div>
+
+<script>
+    function handleOrganizationChange() {
+        var orgSelect = document.getElementById("organization");
+        var locSelect = document.getElementById("location-group");
+
+        if (orgSelect.value !== "") {
+            locSelect.style.display = "block";
+        } else {
+            locSelect.style.display = "none";
+        }
+    }
+</script>
+
 {% endblock %}
