@@ -544,7 +544,11 @@ def pre():
         action = "Clock In"
         url = url_for('views.clock_in')
 
-    return render_template('pre-clockin.html', action=action, url=url)
+    return render_template('pre-clockin.html'
+                           , action=action,
+                             url=url,
+                             name=current_user.username
+                             )
 
 @views.route('/process_qr_code', methods=['POST', 'GET'])
 @login_required
@@ -656,6 +660,7 @@ def attendance_log():
     selected_org_id = request.args.get('organization_id')
     selected_location_id = request.args.get('location_id')
 
+        
     if selected_org_id and selected_location_id:
         attendances = Attendance.query.join(Location).filter(
             Attendance.location_id == selected_location_id,
@@ -667,6 +672,17 @@ def attendance_log():
         ).all()
     else:
         attendances = Attendance.query.all()
+
+    if not selected_org_id and not selected_location_id:
+        # No organization selected, so no attendance records to display
+        return render_template('attendance_log.html',
+                               organizations=organizations,
+                               selected_org_id=selected_org_id,
+                               selected_location_id=selected_location_id,
+                               attendances=attendances,
+                               name=current_user.username
+                               )
+
 
     if current_user.timezone:
         tz = pytz.timezone(current_user.timezone)
@@ -687,13 +703,21 @@ def attendance_log():
             if attendance.clock_out_time:
                 attendance.clock_out_time = attendance.clock_out_time.astimezone(user_tz)
 
+    
+        # Get user's current timezone
+        user_timezone = current_user.timezone
+
+
+
     return render_template(
         'attendance_log.html',
         attendances=attendances,
         organizations=organizations,
         selected_org_id=selected_org_id,
         selected_location_id=selected_location_id,
-        current_time=current_time.strftime('%Y-%m-%d %I:%M:%S %p %Z')
+        current_time=current_time.strftime('%Y-%m-%d %I:%M:%S %p %Z'),
+        name=current_user.username,
+        timezone= user_timezone
     )
 
 
@@ -787,7 +811,12 @@ def set_timezone():
     # Get user's current timezone
     user_timezone = current_user.timezone
 
-    return render_template('settings.html', timezones=TIMEZONES, user_timezone=user_timezone)
+    return render_template(
+        'settings.html',
+        timezones=TIMEZONES,
+        user_timezone=user_timezone,
+        name=current_user.username
+        )
 
 
 

@@ -2,9 +2,19 @@
 {% block title %} Attendance Log {% endblock %}
 
 {% block content %}
-<h3>Attendance Log</h3>
+<div class="container-fluid">
+  <div class="card border border-info text-white w-100">
+    <div class="card-body">
+        <p class="card-text">YOUR CURRENT TIME ZONE IS SET TO: {{ timezone }} </p>
+        <p class="card-text">YOUR LOCAL DATE AND TIME IS:   {{ current_time }}</p>
+        <a href="{{ url_for('views.set_timezone') }}" class="btn btn-sm btn-info">Change timezone</a>
+    </div>
+  </div>
+</div>
+
 <div class="container mt-4">
-    <h4>Attendance Records</h4>
+    <h4>Attendance Log</h4>
+    <h5>Attendance Records</h5>
     <form method="get" action="{{ url_for('views.attendance_log') }}">
         <div class="form-group">
             <label for="organization">Organization</label>
@@ -19,7 +29,7 @@
         </div>
         <div class="form-group mt-2">
             <label for="location">Location</label>
-            <select id="location" name="location_id" class="form-control" onchange="this.form.submit()">
+            <select id="location" name="location_id" class="form-control" onchange="this.form.submit()" {% if not selected_org_id %}disabled{% endif %}>
                 <option value="">Select Location</option>
                 {% if selected_org_id %}
                     {% for organization in organizations %}
@@ -35,32 +45,51 @@
             </select>
         </div>
     </form>
-    <table class="table table-striped mt-4">
-        <thead>
-            <tr>
-                <th scope="col">Date</th>
-                <th scope="col">Name</th>
-                <th scope="col">Time In</th>
-                <th scope="col">Time Out</th>
-                <th scope="col">Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for attendance in attendances %}
-            <tr>
-                <td>{{ attendance.clock_in_time.strftime('%d-%m-%Y') }}</td>
-                <td>{{ attendance.user.username }}</td>
-                <td>{{ attendance.clock_in_time.strftime('%I:%M:%S %p') }}</td>
-                <td>{{ attendance.clock_out_time.strftime('%I:%M:%S %p') if attendance.clock_out_time else 'N/A' }}</td>
-                <td>{{ current_time }}</td>
-                <td>
-                <button class="btn {{ 'btn-success' if attendance.status == 'Early' else 'btn-danger' if attendance.status == 'Late' else 'btn-secondary' }}">
-                    {{ attendance.status }}
-                </button>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+
+    {% if selected_org_id %}
+        {% if attendances %}
+        <table class="table table-striped mt-4">
+            <thead>
+                <tr>
+                    <th scope="col">Date</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Time In</th>
+                    <th scope="col">Time Out</th>
+                    <th scope="col">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for attendance in attendances %}
+                <tr>
+                    <td>{{ attendance.clock_in_time.strftime('%d-%m-%Y') }}</td>
+                    <td>{{ attendance.user.username }}</td>
+                    <td>{{ attendance.clock_in_time.strftime('%I:%M:%S %p') }}</td>
+                    <td>{{ attendance.clock_out_time.strftime('%I:%M:%S %p') if attendance.clock_out_time else 'N/A' }}</td>
+                    <td>
+                        <button class="btn {{ 'btn-success' if attendance.status == 'Early' else 'btn-danger' if attendance.status == 'Late' else 'btn-secondary' }}">
+                            {{ attendance.status }}
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% elif not selected_org_id %}
+        <table class="table table-striped mt-4">
+            <thead>
+                <tr>
+                    <th scope="col">Date</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Time In</th>
+                    <th scope="col">Time Out</th>
+                    <th scope="col">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <p>Choose a location </p>
+            </tbody>
+        </table>
+        {% endif %}
+    {% endif %}
 </div>
 {% endblock %}
