@@ -5,8 +5,8 @@
 <div class="container-fluid">
   <div class="card border border-info text-white w-100">
     <div class="card-body">
-        <p class="card-text">YOUR CURRENT TIME ZONE IS SET TO: {{ timezone }} </p>
-        <p class="card-text">YOUR LOCAL DATE AND TIME IS:   {{ current_time }}</p>
+        <p class="card-text">YOUR CURRENT TIME ZONE IS SET TO:{{ timezone }} </p>
+        <p class="card-text">YOUR LOCAL DATE AND TIME IS:{{ current_time }}</p>
         <a href="{{ url_for('views.set_timezone') }}" class="btn btn-sm btn-info">Change timezone</a>
     </div>
   </div>
@@ -48,48 +48,53 @@
 
     {% if selected_org_id %}
         {% if attendances %}
-        <table class="table table-striped mt-4">
-            <thead>
-                <tr>
+        <div class="container-fluid mt-4">
+            <div class="table-responsive" style="max-height: 400px;">
+              <table class="table table-striped mt-4">
+                <thead>
+                  <tr>
                     <th scope="col">Date</th>
                     <th scope="col">Name</th>
                     <th scope="col">Time In</th>
                     <th scope="col">Time Out</th>
                     <th scope="col">Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for attendance in attendances %}
-                <tr>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for attendance in attendances %}
+                  <tr>
                     <td>{{ attendance.clock_in_time.strftime('%d-%m-%Y') }}</td>
                     <td>{{ attendance.user.username }}</td>
                     <td>{{ attendance.clock_in_time.strftime('%I:%M:%S %p') }}</td>
                     <td>{{ attendance.clock_out_time.strftime('%I:%M:%S %p') if attendance.clock_out_time else 'N/A' }}</td>
                     <td>
-                        <button class="btn {{ 'btn-success' if attendance.status == 'Early' else 'btn-danger' if attendance.status == 'Late' else 'btn-secondary' }}">
-                            {{ attendance.status }}
-                        </button>
+                      <button class="btn {{ 'btn-success' if attendance.status == 'Early' else 'btn-danger' if attendance.status == 'Late' else 'btn-secondary' }}">
+                        {{ attendance.status }}
+                      </button>
                     </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% elif not selected_org_id %}
-        <table class="table table-striped mt-4">
-            <thead>
-                <tr>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+              {% elif not selected_org_id %}
+              <table class="table table-striped mt-4">
+                <thead>
+                  <tr>
                     <th scope="col">Date</th>
                     <th scope="col">Name</th>
                     <th scope="col">Time In</th>
                     <th scope="col">Time Out</th>
                     <th scope="col">Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                <p>Choose a location </p>
-            </tbody>
-        </table>
+                  </tr>
+                </thead>
+                <tbody>
+                  <p>Choose a location </p>
+                </tbody>
+              </table>
+              {% endif %}
+            </div>
+          </div>
         {% endif %}
-    {% endif %}
+    
 </div>
 {% endblock %}
