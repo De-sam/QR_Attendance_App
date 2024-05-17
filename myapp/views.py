@@ -609,7 +609,7 @@ def process_qr_code():
         # Ensure location.deadline is a datetime object with date and time
         if isinstance(location.deadline, datetime):
             deadline_time = location.deadline
-            if current_time <= deadline_time:
+            if c_time <= deadline_time:
                 status = 'Early'
             else:
                 status = 'Late'
@@ -631,7 +631,7 @@ def process_qr_code():
     if attendance:
         attendance.clock_out_time = current_time
         attendance.is_clocked_in = False
-        flash(f'Clock-out at {current_time.strftime("%I:%M:%S %p %Z")} successfully.', 'success')
+        flash(f'Successfully clock-out at {current_time.strftime("%I:%M:%S %p %Z")}.Goodbye!!!', 'success')
     else:
         new_attendance = Attendance(
             user_id=current_user.id,
@@ -641,7 +641,7 @@ def process_qr_code():
             status=status
         )
         db.session.add(new_attendance)
-        flash(f'Clock-in successful. You arrived at {current_time.strftime("%I:%M:%S %p %Z")} ({status}).', 'success')
+        flash(f'Clock-in successful. Good morning you arrived at {current_time.strftime("%I:%M:%S %p %Z")} ({status}).', 'success')
     db.session.commit()
     
     return redirect(url_for('views.dashboard'))
