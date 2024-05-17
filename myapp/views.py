@@ -609,7 +609,7 @@ def process_qr_code():
         # Ensure location.deadline is a datetime object with date and time
         if isinstance(location.deadline, datetime):
             deadline_time = location.deadline
-            if current_time<= deadline_time:
+            if current_time <= deadline_time:
                 status = 'Early'
             else:
                 status = 'Late'
@@ -777,7 +777,7 @@ def set_timezone():
         # Save timezone to the user's profile
         current_user.set_timezone(timezone)
         db.session.commit()
-        flash('Timezone saved successfully.', 'success')
+        flash(f'Timezone set to {timezone} and saved successfully.', 'success')
 
         return redirect(url_for('views.dashboard'))
 
