@@ -604,21 +604,29 @@ def process_qr_code():
     #     flash(f'Not within the required range of the location. Distance: {distance:.2f} meters', 'danger')
     #     return redirect(url_for('views.pre')
 
-    # Check deadline and set status
-    if location.deadline is None:
-        status = 'Absent'
-    elif c_time <= location.deadline:
-        status = 'Early'
-    else:
-        status = 'Late'
-
-    
     if current_user.timezone:
         tz = pytz.timezone(current_user.timezone)
         c_time = datetime.now(tz)
     else:
         c_time = datetime.now(pytz.utc)
 
+
+    # Check deadline and set status
+    if location.deadline:
+        deadline_time = location.deadline
+        deadline_datetime = datetime.combine(c_time.date(), deadline_time, tzinfo=c_time.tzinfo)
+    else:
+        deadline_datetime = None
+
+    # Check deadline and set status
+    if deadline_datetime is None:
+        status = 'Dead line not set'
+    elif c_time <= deadline_datetime:
+        status = 'Early'
+    else:
+        status = 'Late'
+    
+    
     
 
     # Find if there's an open attendance record
