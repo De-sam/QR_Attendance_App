@@ -606,17 +606,14 @@ def process_qr_code():
 
     # Check deadline and set status
     if location.deadline:
-        # Ensure location.deadline is a datetime object with date and time
-        if isinstance(location.deadline, datetime):
-            deadline_time = location.deadline
-            if c_time <= deadline_time:
-                status = 'Early'
-            else:
-                status = 'Late'
-        else:
+        # Check deadline and set status
+        if location.deadline is None:
             status = 'Absent'
-    else:
-        status = 'Deadline not set'
+        elif c_time <= location.deadline:
+            status = 'Early'
+        else:
+            status = 'Late'
+
     
     if current_user.timezone:
         tz = pytz.timezone(current_user.timezone)
