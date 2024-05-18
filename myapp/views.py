@@ -680,23 +680,35 @@ def attendance_log():
     organizations = Organization.query.filter_by(user_id=current_user.id).all()
     selected_org_id = request.args.get('organization_id')
     selected_location_id = request.args.get('location_id')
+    selected_status = request.args.get('status')
+    selected_date = request.args.get('date')
 
         
     if selected_org_id and selected_location_id:
-        attendances = Attendance.query.join(Location).filter(
+        query = Attendance.query.join(Location).filter(
             Attendance.location_id == selected_location_id,
             Location.organization_id == selected_org_id
-        ).all()
+        )
     elif selected_org_id:
-        attendances = Attendance.query.join(Location).filter(
+        query = Attendance.query.join(Location).filter(
             Location.organization_id == selected_org_id
-        ).all()
+        )
     else:
-        attendances = Attendance.query.all()
+        query = Attendance.query
 
+    if selected_status:
+        query = query.filter(Attendance.status == selected_status)
+
+    if selected_date:
+        date_obj = datetime.strptime(selected_date, '%Y-%m-%d')
+        query = query.filter(db.func.date(Attendance.clock_in_time) == date_obj)
+
+    attendances = query.all()
+    
      # Get user's current timezone
     user_timezone = current_user.timezone    
 
+   
     
     if current_user.timezone:
         tz = pytz.timezone(current_user.timezone)
@@ -730,9 +742,15 @@ def attendance_log():
             if attendance.clock_out_time:
                 attendance.clock_out_time = attendance.clock_out_time.astimezone(user_tz)
 
-    
-       
+    selected_status = request.args.get('status')
+    selected_date = request.args.get('date')
 
+    if selected_status:
+            query = query.filter(Attendance.status == selected_status)
+
+    if selected_date:
+            date_obj = datetime.strptime(selected_date, '%Y-%m-%d')
+            query = query.filter(db.func.date(Attendance.clock_in_time) == date_obj)
 
 
     return render_template(
@@ -744,6 +762,8 @@ def attendance_log():
         name=current_user.username,
         current_date=current_time.strftime('%d-%m-%Y'),
         current_time=current_time.strftime('%I:%M:%S %p %Z'),
+        selected_status=selected_status,
+        selected_date=selected_date,
         timezone= user_timezone
     )
 
