@@ -669,7 +669,7 @@ def process_qr_code():
             status=status
         )
         db.session.add(new_attendance)
-        flash(f'Clock-in successful. Good morning you arrived at {current_time.strftime("%I:%M:%S %p %Z")} ({status}).', 'success')
+        flash(f'Clock-in successful. You arrived at {current_time.strftime("%I:%M:%S %p %Z")} ({status}).', 'success')
     db.session.commit()
     
     return redirect(url_for('views.dashboard'))
