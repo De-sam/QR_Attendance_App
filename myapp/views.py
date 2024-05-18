@@ -13,7 +13,7 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy.exc import IntegrityError
 from haversine import haversine, Unit
 from sqlalchemy.sql import func
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone,date
 import pytz
 
 
@@ -80,18 +80,23 @@ def dashboard():
     has_results = bool(member_details)
 
     # Get the current date
-    today = datetime.now().date()
+    today = date.today()
     
-     # Query to get today's attendance records for user's locations
+    # Get the locations the current user is a member of
+    user_locations = current_user.locations
+    
+    # Query to get today's attendance records for user's locations
     today_attendance = Attendance.query.filter(
         db.func.date(Attendance.clock_in_time) == today,
         Attendance.location.has(Location.members.contains(current_user))
-    ).all() 
+    ).all()
     
+    total_members = len(member_details)
+
     # Calculate the number of present and absent members
     total_present = sum(1 for record in today_attendance if record.is_clocked_in or record.clock_out_time is not None)
-    total_absent = sum(1 for record in today_attendance if not record.is_clocked_in and record.clock_out_time is None)
-
+    
+    total_absent= total_members - total_present
 
     return render_template(
         'dashboard_base.html',
