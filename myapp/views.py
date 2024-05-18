@@ -79,6 +79,20 @@ def dashboard():
 
     has_results = bool(member_details)
 
+    # Get the current date
+    today = datetime.now().date()
+    
+     # Query to get today's attendance records for user's locations
+    today_attendance = Attendance.query.filter(
+        db.func.date(Attendance.clock_in_time) == today,
+        Attendance.location.has(Location.members.contains(current_user))
+    ).all() 
+    
+    # Calculate the number of present and absent members
+    total_present = sum(1 for record in today_attendance if record.is_clocked_in or record.clock_out_time is not None)
+    total_absent = sum(1 for record in today_attendance if not record.is_clocked_in and record.clock_out_time is None)
+
+
     return render_template(
         'dashboard_base.html',
         name=current_user.username,
@@ -88,7 +102,9 @@ def dashboard():
         join_requests=pending_join_requests,
         member_details=member_details if member_details else None,
         location=Location,
-        has_results=has_results
+        has_results=has_results,
+        total_present=total_present,
+        total_absent=total_absent
     )
 
 
