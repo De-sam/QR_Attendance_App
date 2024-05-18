@@ -681,8 +681,8 @@ def attendance_log():
     selected_org_id = request.args.get('organization_id')
     selected_location_id = request.args.get('location_id')
     selected_status = request.args.get('status')
-    selected_date = request.args.get('date')
-
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
         
     if selected_org_id and selected_location_id:
         query = Attendance.query.join(Location).filter(
@@ -699,11 +699,16 @@ def attendance_log():
     if selected_status:
         query = query.filter(Attendance.status == selected_status)
 
-    if selected_date:
-        date_obj = datetime.strptime(selected_date, '%Y-%m-%d')
-        query = query.filter(db.func.date(Attendance.clock_in_time) == date_obj)
+    if start_date:
+        start_date_obj = datetime.strptime(start_date, '%Y-%m-%d')
+        query = query.filter(Attendance.clock_in_time >= start_date_obj)
+
+    if end_date:
+        end_date_obj = datetime.strptime(end_date, '%Y-%m-%d')
+        query = query.filter(Attendance.clock_in_time <= end_date_obj)
 
     attendances = query.all()
+
     
      # Get user's current timezone
     user_timezone = current_user.timezone    

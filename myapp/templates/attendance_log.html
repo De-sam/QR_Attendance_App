@@ -23,49 +23,53 @@
     <h4>Attendance Log</h4>
     <h5>Attendance Records</h5>
     <form method="get" action="{{ url_for('views.attendance_log') }}">
-        <div class="form-group">
-            <label for="organization">Organization</label>
-            <select id="organization" name="organization_id" class="form-control" onchange="this.form.submit()">
-                <option value="">Select Organization</option>
-                {% for organization in organizations %}
-                <option value="{{ organization.id }}" {% if organization.id|string == selected_org_id %}selected{% endif %}>
-                    {{ organization.name }}
-                </option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="form-group mt-2">
-            <label for="location">Location</label>
-            <select id="location" name="location_id" class="form-control" onchange="this.form.submit()" {% if not selected_org_id %}disabled{% endif %}>
-                <option value="">Select Location</option>
-                {% if selected_org_id %}
-                    {% for organization in organizations %}
-                        {% if organization.id|string == selected_org_id %}
-                            {% for location in organization.locations %}
-                                <option value="{{ location.id }}" {% if location.id|string == selected_location_id %}selected{% endif %}>
-                                    {{ location.alias }}
-                                </option>
-                            {% endfor %}
-                        {% endif %}
-                    {% endfor %}
-                {% endif %}
-            </select>
-        </div>
-        <div class="form-group mt-2">
-            <label for="status">Status</label>
-            <select id="status" name="status" class="form-control" onchange="this.form.submit()">
-                <option value="">Select Status</option>
-                <option value="Early" {% if 'Early' == selected_status %}selected{% endif %}>Early</option>
-                <option value="Late" {% if 'Late' == selected_status %}selected{% endif %}>Late</option>
-                <option value="Absent" {% if 'Absent' == selected_status %}selected{% endif %}>Absent</option>
-            </select>
-        </div>
-        <div class="form-group mt-2">
-            <label for="date">Date</label>
-            <input type="date" id="date" name="date" class="form-control" onchange="this.form.submit()" value="{{ selected_date }}">
-        </div>
-    </form>
-
+      <div class="form-group">
+          <label for="organization">Organization</label>
+          <select id="organization" name="organization_id" class="form-control" onchange="this.form.submit()">
+              <option value="">Select Organization</option>
+              {% for organization in organizations %}
+              <option value="{{ organization.id }}" {% if organization.id|string == selected_org_id %}selected{% endif %}>
+                  {{ organization.name }}
+              </option>
+              {% endfor %}
+          </select>
+      </div>
+      <div class="form-group mt-2">
+          <label for="location">Location</label>
+          <select id="location" name="location_id" class="form-control" onchange="this.form.submit()" {% if not selected_org_id %}disabled{% endif %}>
+              <option value="">Select Location</option>
+              {% if selected_org_id %}
+                  {% for organization in organizations %}
+                      {% if organization.id|string == selected_org_id %}
+                          {% for location in organization.locations %}
+                              <option value="{{ location.id }}" {% if location.id|string == selected_location_id %}selected{% endif %}>
+                                  {{ location.alias }}
+                              </option>
+                          {% endfor %}
+                      {% endif %}
+                  {% endfor %}
+              {% endif %}
+          </select>
+      </div>
+      <div class="form-group mt-2">
+          <label for="status">Status</label>
+          <select id="status" name="status" class="form-control" onchange="this.form.submit()">
+              <option value="">Select Status</option>
+              <option value="Early" {% if selected_status == 'Early' %}selected{% endif %}>Early</option>
+              <option value="Late" {% if selected_status == 'Late' %}selected{% endif %}>Late</option>
+              <option value="On time" {% if selected_status == 'On time' %}selected{% endif %}>On time</option>
+          </select>
+      </div>
+      <div class="form-group mt-2">
+          <label for="start_date">From Date</label>
+          <input type="date" id="start_date" name="start_date" class="form-control" value="{{ start_date }}">
+      </div>
+      <div class="form-group mt-2">
+          <label for="end_date">To Date</label>
+          <input type="date" id="end_date" name="end_date" class="form-control" value="{{ end_date }}">
+      </div>
+      <button type="submit" class="btn btn-danger mt-2">Filter</button>
+  </form>
     {% if selected_org_id %}
         {% if attendances %}
         <div class="container-fluid mt-4">
