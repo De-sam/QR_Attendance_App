@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Attendance Report</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .status-early {
+            background-color: #d4edda;
+        }
+        .status-late {
+            background-color: #f8d7da;
+        }
+        .status-ontime {
+            background-color: #d1ecf1;
+        }
+    </style>
+</head>
+<body>
+    <h1>Attendance Report </h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Name</th>
+                <th>Time In</th>
+                <th>Time Out</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for attendance in attendances %}
+            <tr>
+                <td>{{ attendance.clock_in_time.strftime('%d-%m-%Y') }}</td>
+                <td>{{ attendance.user.username }}</td>
+                <td>{{ attendance.clock_in_time.strftime('%I:%M:%S %p') }}</td>
+                <td>{{ attendance.clock_out_time.strftime('%I:%M:%S %p') if attendance.clock_out_time else 'N/A' }}</td>
+                <td class="status-{{ attendance.status | lower | replace(' ', '') }}">{{ attendance.status }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

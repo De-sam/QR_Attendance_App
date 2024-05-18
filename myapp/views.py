@@ -1,4 +1,4 @@
-from flask import Blueprint,render_template,session
+from flask import Blueprint,render_template,session,send_file
 from flask_login import login_required,current_user
 import uuid
 from flask import current_app
@@ -15,6 +15,7 @@ from haversine import haversine, Unit
 from sqlalchemy.sql import func
 from datetime import datetime, timedelta, timezone,date
 import pytz
+from weasyprint import HTML
 
 
 
@@ -683,7 +684,8 @@ def attendance_log():
     selected_status = request.args.get('status')
     start_date = request.args.get('start_date')
     end_date = request.args.get('end_date')
-        
+    download = request.args.get('download')
+
     if selected_org_id and selected_location_id:
         query = Attendance.query.join(Location).filter(
             Attendance.location_id == selected_location_id,
@@ -746,6 +748,14 @@ def attendance_log():
             attendance.clock_in_time = attendance.clock_in_time.astimezone(user_tz)
             if attendance.clock_out_time:
                 attendance.clock_out_time = attendance.clock_out_time.astimezone(user_tz)
+
+    if download == 'pdf':
+        html = render_template('attendance_pdf.html', attendances=attendances, user_timezone=current_user.timezone)
+        pdf = HTML(string=html).write_pdf()
+        response = BytesIO(pdf)
+        response.seek(0)
+        return send_file(response, mimetype='application/pdf', as_attachment=True, download_name='attendance.pdf')
+
 
     selected_status = request.args.get('status')
     selected_date = request.args.get('date')
