@@ -5,9 +5,9 @@
 <div class="container-fluid">
   <div class="card border border-info text-white w-100">
     <div class="card-body">
-      <p class="card-text fs-6 fs-md-5">TIME ZONE: {{ timezone }}</p>
-      <p class="card-text fs-6 fs-md-5">LOCAL TIME: {{ current_time }}</p>
-      <p class="card-text fs-6 fs-md-5">TODAY'S DATE: {{ current_date }}</p>        
+      <p  style="font-size: x-small;" class="card-text ">TIME ZONE: {{ timezone }}</p>
+      <p style="font-size: x-small;" class="card-text ">LOCAL TIME: {{ current_time }}</p>
+      <p style="font-size: x-small;" class="card-text ">TODAY'S DATE: {{ current_date }}</p>        
       <a href="{{ url_for('views.set_timezone') }}" class="btn btn-sm btn-outline-info">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
             <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0"/>
