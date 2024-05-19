@@ -15,7 +15,7 @@ from haversine import haversine, Unit
 from sqlalchemy.sql import func
 from datetime import datetime, timedelta, timezone,date
 import pytz
-from weasyprint import HTML
+from flask_weasyprint import HTML, render_pdf
 
 
 
@@ -751,8 +751,9 @@ def attendance_log():
 
     if download == 'pdf':
         html = render_template('attendance_pdf.html', attendances=attendances, user_timezone=current_user.timezone)
-        pdf = HTML(string=html).write_pdf()
-        response = BytesIO(pdf)
+        pdf = render_pdf(HTML(string=html))
+        response = BytesIO()
+        pdf.write(response)
         response.seek(0)
         return send_file(response, mimetype='application/pdf', as_attachment=True, download_name='attendance.pdf')
 

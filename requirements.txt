@@ -15,6 +15,7 @@ flask-form==1.0.0
 Flask-Login==0.6.3
 Flask-Migrate==4.0.7
 Flask-SQLAlchemy==3.1.1
+flask_weasyprint==1.1.0
 fonttools==4.51.0
 geographiclib==2.0
 geopy==2.4.1
