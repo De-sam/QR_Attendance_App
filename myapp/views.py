@@ -1,4 +1,4 @@
-from flask import Blueprint,render_template,session,send_file
+from flask import Blueprint,render_template,session,send_file,Response
 from flask_login import login_required,current_user
 import uuid
 from flask import current_app
@@ -16,6 +16,7 @@ from sqlalchemy.sql import func
 from datetime import datetime, timedelta, timezone,date
 import pytz
 from flask_weasyprint import HTML, render_pdf
+
 
 
 
@@ -748,12 +749,12 @@ def attendance_log():
             attendance.clock_in_time = attendance.clock_in_time.astimezone(user_tz)
             if attendance.clock_out_time:
                 attendance.clock_out_time = attendance.clock_out_time.astimezone(user_tz)
-
+    
+    import pdfkit
     if download == 'pdf':
         html = render_template('attendance_pdf.html', attendances=attendances, user_timezone=current_user.timezone)
-        pdf = render_pdf(HTML(string=html))
-        response = BytesIO()
-        pdf.write(response)
+        pdf = pdfkit.from_string(html, False)
+        response = BytesIO(pdf)
         response.seek(0)
         return send_file(response, mimetype='application/pdf', as_attachment=True, download_name='attendance.pdf')
 
