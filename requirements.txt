@@ -2,6 +2,7 @@ alchemy==20.5
 alembic==1.13.1
 blinker==1.7.0
 Brotli==1.1.0
+cairocffi==1.7.0
 certifi==2024.2.2
 cffi==1.16.0
 chardet==3.0.4
