@@ -37,7 +37,7 @@ class User(db.Model, UserMixin):
     def get_current_time_in_timezone(self):
         """Return the current time in the user's timezone."""
         return datetime.now(pytz.timezone(self.timezone))
-
+    
     def __repr__(self):
         return f"User('{self.username}', '{self.email}', '{self.timezone}')"
 

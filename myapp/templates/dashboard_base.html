@@ -322,6 +322,7 @@
 		<div id="main-content">
 			<div id="main-content__container col-md-12 mx-auto">
 				{% block content %}
+				{% if is_admin %}
 				<div class="container mt-5">
 					<div class="row g-3"> 
 						<!-- First Card -->
@@ -355,7 +356,7 @@
 								</div>
 							</div>
 						</div>
-				
+						
 						<!-- Third Card -->
 						<div class="col-md-4">
 							<div class="card text-white bg-dark mb-3">
@@ -385,7 +386,6 @@
 								</div>
 							</div>
 						</div>
-						
 					<div class="container-fluid mt-4">
 						<div class="btn btn-sm btn-danger">
 							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-building-add" viewBox="0 0 16 16">
@@ -473,6 +473,10 @@
 {% endif %}
 {% endif %}
 {% endblock %}
+{% endif %}
+{% if is_member %}
+Am a member
+{% endif %}
 			</div>
 		</div> <!-- main-content -->		
 	</section> <!-- main -->

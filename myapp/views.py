@@ -15,7 +15,7 @@ from haversine import haversine, Unit
 from sqlalchemy.sql import func
 from datetime import datetime, timedelta, timezone,date
 import pytz
-from flask_weasyprint import HTML, render_pdf
+
 
 
 
@@ -48,10 +48,25 @@ def home():
 @views.route('/dashboard/')
 @login_required
 def dashboard():
-    user_id = current_user.id  # Get the current user's ID
+    user_id = current_user.id 
+    search_query = request.args.get('search', '').strip()
+    user = current_user
+   
+   # Determine if the user is an admin
+    is_admin = Organization.query.with_entities(func.count(Organization.id)).filter_by(user_id=user_id).scalar() > 0
+
+    # Check if the user is a member of any organization
+    is_member = db.session.query(func.exists().label('exists')).select_from(User).outerjoin(Location).filter(
+        User.id == user_id, Location.id != None
+    ).scalar()
+
     search_query = request.args.get('search', '').strip()
 
-    # Fetch organizations along with locations and pending join requests in a single query
+    user = User.query.filter_by(id=user_id).first()
+
+
+
+   
     organizations = Organization.query.options(
         joinedload(Organization.locations),
         joinedload(Organization.join_requests).joinedload(JoinRequest.location)
@@ -111,7 +126,9 @@ def dashboard():
         location=Location,
         has_results=has_results,
         total_present=total_present,
-        total_absent=total_absent
+        total_absent=total_absent,
+        is_admin=is_admin,
+        is_member=is_member
     )
 
 
