@@ -55,11 +55,6 @@ def dashboard():
    # Determine if the user is an admin
     is_admin = Organization.query.with_entities(func.count(Organization.id)).filter_by(user_id=user_id).scalar() > 0
 
-    # Check if the user is a member of any organization
-    is_member = db.session.query(func.exists().label('exists')).select_from(User).outerjoin(Location).filter(
-        User.id == user_id, Location.id != None
-    ).scalar()
-
     search_query = request.args.get('search', '').strip()
 
     user = User.query.filter_by(id=user_id).first()
@@ -128,7 +123,7 @@ def dashboard():
         total_present=total_present,
         total_absent=total_absent,
         is_admin=is_admin,
-        is_member=is_member
+        is_member=member_details
     )
 
 

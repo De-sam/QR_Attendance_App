@@ -238,6 +238,7 @@
 					
 					
 					{% block menu %}
+					{% if is_admin %}
 					<li>
 						<a href="/manage_org">
 							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-sliders" viewBox="0 0 16 16">
@@ -246,7 +247,7 @@
 							<span>Manage Organisation</span>
 						</a>
 					</li>
-					
+					{% endif %}
 					<li class="menu-heading"><span>Attendance</span></li>
 						<li>
 						<a href="/pre">
@@ -258,6 +259,7 @@
 							<span>Clock-in/Clock-out</span>
 						</a>
 						</li>
+						{% if is_admin %}
 						<li>
 						<a href="/attendance_log">
 							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-graph-down" viewBox="0 0 16 16">
@@ -266,6 +268,7 @@
 							<span>Attendance log</span>
 						</a>
 						</li>
+						{% endif %}
 						<li>
 						<a href="#">
 							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-people" viewBox="0 0 16 16">
@@ -322,6 +325,9 @@
 		<div id="main-content">
 			<div id="main-content__container col-md-12 mx-auto">
 				{% block content %}
+				{% if is_member %}
+				
+				{% endif %}
 				{% if is_admin %}
 				<div class="container mt-5">
 					<div class="row g-3"> 
@@ -472,11 +478,10 @@
 </div>
 {% endif %}
 {% endif %}
+{% endif %}
 {% endblock %}
-{% endif %}
-{% if is_member %}
-Am a member
-{% endif %}
+
+
 			</div>
 		</div> <!-- main-content -->		
 	</section> <!-- main -->
