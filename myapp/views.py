@@ -634,14 +634,45 @@ def process_qr_code():
 
     current_time = datetime.now(tz)
     print(f"Current time in user's timezone: {current_time}")
+    import math
+    
+     # Helper functions
+    def deg_to_rad(deg):
+        return deg * (math.pi / 180)
 
-    # Distance validation using Haversine
-    # location_coords = (location.latitude, location.longitude)
-    # distance = haversine(current_coords, location_coords, unit=Unit.METERS)
-    # print(f"Calculated distance: {distance} meters")
-    # if distance > 500:
-    #     flash(f'Not within the required range of the location. Distance: {distance:.2f} meters', 'danger')
-    #     return redirect(url_for('views.pre')
+    def haversine(lat1, lon1, lat2, lon2):
+        R = 6371000  # Radius of the Earth in meters
+        lat1_rad = deg_to_rad(lat1)
+        lon1_rad = deg_to_rad(lon1)
+        lat2_rad = deg_to_rad(lat2)
+        lon2_rad = deg_to_rad(lon2)
+        d_lat = lat2_rad - lat1_rad
+        d_lon = lon2_rad - lon1_rad
+        a = math.sin(d_lat / 2) ** 2 + math.cos(lat1_rad) * math.cos(lat2_rad) * math.sin(d_lon / 2) ** 2
+        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+        distance = R * c
+        return distance
+
+    def is_within_radius(lat1, lon1, lat2, lon2, radius=100):
+        delta = 0.0020  # Delta value for bounding box approximation
+        lat_min = lat1 - delta
+        lat_max = lat1 + delta
+        lon_min = lon1 - delta
+        lon_max = lon1 + delta
+        if lat_min <= lat2 <= lat_max and lon_min <= lon2 <= lon_max:
+            distance = haversine(lat1, lon1, lat2, lon2)
+            return distance <= radius, distance
+        else:
+            return False, None
+
+    location_coords = (location.latitude, location.longitude)
+    within_radius, distance = is_within_radius(lat, lng, location.latitude, location.longitude, 500)
+    if not within_radius:
+        flash(f'Not within the required range of the location. Distance: {distance:.2f} meters', 'danger')
+        return redirect(url_for('views.dashboard'))
+    else:
+        print(f"Calculated distance: {distance:.2f} meters")
+        flash(f'Within the required range of the location. Distance: {distance:.2f} meters', 'success')
 
     if current_user.timezone:
         tz = pytz.timezone(current_user.timezone)
