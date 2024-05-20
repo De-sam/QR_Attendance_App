@@ -635,7 +635,7 @@ def process_qr_code():
     current_time = datetime.now(tz)
     print(f"Current time in user's timezone: {current_time}")
     import math
-    
+
      # Helper functions
     def deg_to_rad(deg):
         return deg * (math.pi / 180)
@@ -653,27 +653,37 @@ def process_qr_code():
         distance = R * c
         return distance
 
-    def is_within_radius(lat1, lon1, lat2, lon2, radius=100):
+    # Helper function to check if within radius using bounding box and Haversine
+    def is_within_radius(lat1, lon1, lat2, lon2, radius=500):
         delta = 0.0020  # Delta value for bounding box approximation
+
+        # Create a bounding box around the initial coordinates
         lat_min = lat1 - delta
         lat_max = lat1 + delta
         lon_min = lon1 - delta
         lon_max = lon1 + delta
+        
+        # Check if the coordinates are within the bounding box
         if lat_min <= lat2 <= lat_max and lon_min <= lon2 <= lon_max:
-            distance = haversine(lat1, lon1, lat2, lon2)
+            # If within bounding box, calculate precise distance using haversine library
+            distance = haversine((lat1, lon1), (lat2, lon2), unit=Unit.METERS)
             return distance <= radius, distance
         else:
+            # Outside the bounding box, definitely out of range
             return False, None
 
     location_coords = (location.latitude, location.longitude)
     within_radius, distance = is_within_radius(lat, lng, location.latitude, location.longitude, 500)
     if not within_radius:
-        flash(f'Not within the required range of the location. Distance: {distance:.2f} meters', 'danger')
+        if distance is not None:
+            flash(f'Not within the required range of the location. Distance: {distance:.2f} meters', 'danger')
+        else:
+            flash('Not within the required range of the location.', 'danger')
         return redirect(url_for('views.dashboard'))
     else:
         print(f"Calculated distance: {distance:.2f} meters")
-        flash(f'Within the required range of the location. Distance: {distance:.2f} meters', 'success')
-
+        flash(f'Within the required range of the location. Distance: {distance:.2f} meters', 'info')
+    
     if current_user.timezone:
         tz = pytz.timezone(current_user.timezone)
         c_time = datetime.now(tz)
