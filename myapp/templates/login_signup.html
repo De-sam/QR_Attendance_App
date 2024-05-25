@@ -28,16 +28,8 @@
     
         <div class="logo">QA_S</div>
         <div class="d-flex justify-content-center">
-            <a href="" class="btn-toggle" style="text-decoration: none; ">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-google" viewBox="0 0 16 16">
-                    <path d="M15.545 6.558a9.4 9.4 0 0 1 .139 1.626c0 2.434-.87 4.492-2.384 5.885h.002C11.978 15.292 10.158 16 8 16A8 8 0 1 1 8 0a7.7 7.7 0 0 1 5.352 2.082l-2.284 2.284A4.35 4.35 0 0 0 8 3.166c-2.087 0-3.86 1.408-4.492 3.304a4.8 4.8 0 0 0 0 3.063h.003c.635 1.893 2.405 3.301 4.492 3.301 1.078 0 2.004-.276 2.722-.764h-.003a3.7 3.7 0 0 0 1.599-2.431H8v-3.08z"/>
-                </svg>
-                Google
-            </a>
-            <button type="button" class="btn-toggle active" data-form="login" onclick="toggleForm('login')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-in-right" viewBox="0 0 16 16">
-                <path fill-rule="evenodd" d="M6 3.5a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-2a.5.5 0 0 0-1 0v2A1.5 1.5 0 0 0 6.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-8A1.5 1.5 0 0 0 5 3.5v2a.5.5 0 0 0 1 0z"/>
-                <path fill-rule="evenodd" d="M11.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H1.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708z"/>
-              </svg>Login</button>
+
+            <button type="button" class="btn-toggle active" data-form="login" onclick="toggleForm('login')">Login</button>
             <button type="button" class="btn-toggle" data-form="signup" onclick="toggleForm('signup')">Sign up</button>
         </div>
 
@@ -86,7 +78,6 @@
                 <div class=" form- control d-grid gap-2 col-6 mx-auto" >
                     <button type="submit" class="btn btn-danger w-100">Sign Up</button>
                 </div>
-                <a href="#" class="text-center d-block"style="color: red; text-decoration: none;">Sign up with Google</a>
             </form>
         </div>
 
@@ -118,9 +109,20 @@
                 </div>
                 <div class="form-group">
                     <button type="submit" class="btn btn-danger w-100">Login</button>
+                    <div style="display: flex; align-items: center; text-align: center; margin: 10px 0;">
+                        <span style="flex: 1; border-bottom: 1px solid #000; margin-right: 10px;"></span>
+                        <span>or</span>
+                        <span style="flex: 1; border-bottom: 1px solid #000; margin-left: 10px;"></span>
+                    </div>
+                    <a href="" class="btn w-100 btn-outline-danger" style="text-decoration: none; ">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-google" viewBox="0 0 16 16">
+                            <path d="M15.545 6.558a9.4 9.4 0 0 1 .139 1.626c0 2.434-.87 4.492-2.384 5.885h.002C11.978 15.292 10.158 16 8 16A8 8 0 1 1 8 0a7.7 7.7 0 0 1 5.352 2.082l-2.284 2.284A4.35 4.35 0 0 0 8 3.166c-2.087 0-3.86 1.408-4.492 3.304a4.8 4.8 0 0 0 0 3.063h.003c.635 1.893 2.405 3.301 4.492 3.301 1.078 0 2.004-.276 2.722-.764h-.003a3.7 3.7 0 0 0 1.599-2.431H8v-3.08z"/>
+                        </svg>
+                        Sign in with google
+                    </a>
                 </div>
                 
-                <a href="#" data-toggle="modal" data-target="#forgotPasswordModal" style="color: red; text-decoration: none;">Forgot Password?</a>
+                <a href="#" data-toggle="modal" data-target="#forgotPasswordModal" style="color: red; text-decoration: none;"  >Forgot Password?</a>
         </form>
     </div>
 </div>
