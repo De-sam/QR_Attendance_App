@@ -179,7 +179,9 @@ def create_org():
     return render_template('create_org.html',
                             name=current_user.username,
                             is_admin=is_admin,
-                            is_memeber=user_locations)
+                            is_memeber=user_locations,
+                            is_admin=is_admin,
+                            is_member=user_locations)
 
 def generate_organization_code(name):
     if len(name) < 3:
