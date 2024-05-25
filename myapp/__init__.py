@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 import psycopg2 
 import pytz
 from datetime import datetime 
+from flask_oauthlib.client import OAuth
 
 
 load_dotenv()
@@ -37,10 +38,20 @@ def create_app():
     db.init_app(app)
     migrate = Migrate(app, db)
    
-    
-   
-    
-
+    oauth = OAuth(app)
+    google = oauth.remote_app(
+        'google',
+        consumer_key=os.getenv('GOOGLE_CLIENT_ID'),
+        consumer_secret=os.getenv('GOOGLE_CLIENT_SECRET'),
+        request_token_params={
+            'scope': 'email',
+        },
+        base_url='https://www.googleapis.com/oauth2/v1/',
+        request_token_url=None,
+        access_token_method='POST',
+        access_token_url='https://accounts.google.com/o/oauth2/token',
+        authorize_url='https://accounts.google.com/o/oauth2/auth',
+    )
 
 
     from .views import views
