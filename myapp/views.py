@@ -54,11 +54,10 @@ def dashboard():
    
    # Determine if the user is an admin
     is_admin = Organization.query.with_entities(func.count(Organization.id)).filter_by(user_id=user_id).scalar() > 0
-
     search_query = request.args.get('search', '').strip()
-
     user = User.query.filter_by(id=user_id).first()
 
+    user_locations = current_user.locations
 
 
    
@@ -123,7 +122,7 @@ def dashboard():
         total_present=total_present,
         total_absent=total_absent,
         is_admin=is_admin,
-        is_member=member_details
+        is_member=user_locations
     )
 
 
@@ -216,6 +215,7 @@ def join_org():
         else:
             flash('No organization found with the provided code..', category='warning')
             return redirect(url_for('views.join_org'))
+    
     return render_template('join_org.html', name=current_user.username)
 
 @views.route('/join_request/<int:organization_id>', methods=['GET', 'POST'])
