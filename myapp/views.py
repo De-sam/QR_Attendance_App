@@ -54,9 +54,6 @@ def dashboard():
    
    # Determine if the user is an admin
     is_admin = Organization.query.with_entities(func.count(Organization.id)).filter_by(user_id=user_id).scalar() > 0
-    search_query = request.args.get('search', '').strip()
-    user = User.query.filter_by(id=user_id).first()
-
     user_locations = current_user.locations
 
 
@@ -149,6 +146,7 @@ def create_org():
         name = request.form.get('name').strip().upper()  # Strip whitespace for consistent comparison
         user_id = current_user.id  # Static for demonstration; use authenticated user's ID in production
         
+
         # Check if the organization name already exists
         existing_organization = Organization.query.filter_by(name=name).first()
         if existing_organization:
@@ -174,7 +172,14 @@ def create_org():
         db.session.commit()
         flash('Organization created successfully!', category='success')
         return redirect(url_for('views.manage_org'))
-    return render_template('create_org.html', name=current_user.username)
+    user_id = current_user.id  # Static for demonstration; use authenticated user's ID in production
+    is_admin = Organization.query.with_entities(func.count(Organization.id)).filter_by(user_id=user_id).scalar() > 0
+    user_locations = current_user.locations
+        
+    return render_template('create_org.html',
+                            name=current_user.username,
+                            is_admin=is_admin,
+                            is_memeber=user_locations)
 
 def generate_organization_code(name):
     if len(name) < 3:
@@ -196,10 +201,16 @@ def generate_organization_code(name):
 def manage_org():
 
     organizations = Organization.query.filter_by(user_id=current_user.id).all()
+    user_id = current_user.id  # Static for demonstration; use authenticated user's ID in production
+    is_admin = Organization.query.with_entities(func.count(Organization.id)).filter_by(user_id=user_id).scalar() > 0
+    user_locations = current_user.locations
+
     return render_template(
         'manage_org.html',
           organizations=organizations,
-          name=current_user.username
+          name=current_user.username,
+          is_admin=is_admin,
+          is_member=user_locations
           )
 
 
@@ -215,8 +226,13 @@ def join_org():
         else:
             flash('No organization found with the provided code..', category='warning')
             return redirect(url_for('views.join_org'))
-    
-    return render_template('join_org.html', name=current_user.username)
+    user_id = current_user.id  # Static for demonstration; use authenticated user's ID in production
+    is_admin = Organization.query.with_entities(func.count(Organization.id)).filter_by(user_id=user_id).scalar() > 0
+    user_locations = current_user.locations
+    return render_template('join_org.html',
+                            name=current_user.username,
+                            is_admin= is_admin,
+                            is_member = user_locations)
 
 @views.route('/join_request/<int:organization_id>', methods=['GET', 'POST'])
 @login_required
@@ -331,9 +347,15 @@ def view_join_requests():
         joinedload(JoinRequest.location)
     ).filter_by(user_id=user_id).all()
 
+    user_id = current_user.id  # Static for demonstration; use authenticated user's ID in production
+    is_admin = Organization.query.with_entities(func.count(Organization.id)).filter_by(user_id=user_id).scalar() > 0
+    user_locations = current_user.locations
     return render_template(
         'request_status.html',
-        join_requests=join_requests
+        join_requests=join_requests,
+        nmae=current_user.username,
+        is_admin=is_admin,
+        is_member=user_locations
     )
 
 @views.route('/add_location/<int:org_id>', methods=['POST','GET'])
@@ -375,12 +397,17 @@ def add_location(org_id):
             flash('Location was added successfully!', category='success')
 
     locations = Location.query.filter_by(organization_id=org_id).all()
+    user_id = current_user.id  # Static for demonstration; use authenticated user's ID in production
+    is_admin = Organization.query.with_entities(func.count(Organization.id)).filter_by(user_id=user_id).scalar() > 0
+    user_locations = current_user.locations
     return render_template(
         'add_location.html',
         org_id=org_id,
         name=current_user.username,
         organization=organization,
-        locations=locations
+        locations=locations,
+        is_admin=is_admin,
+        is_member=user_locations
     )
 
 @views.route('/manage_location/<int:org_id>')
@@ -393,11 +420,16 @@ def manage_locations(org_id):
         return redirect(url_for('views.dashboard'))
 
     locations = Location.query.filter_by(organization_id=organization.id).all()  # Use the organization's ID
+    user_id = current_user.id  # Static for demonstration; use authenticated user's ID in production
+    is_admin = Organization.query.with_entities(func.count(Organization.id)).filter_by(user_id=user_id).scalar() > 0
+    user_locations = current_user.locations
     return render_template(
         'manage_locations.html',
         organization=organization,
         locations=locations,
-        name=current_user.username
+        name=current_user.username,
+        is_admin=is_admin,
+        is_member=user_locations
     )
 
 @views.route('/delete_organization/<int:org_id>', methods=['POST', 'GET' ])
@@ -469,14 +501,18 @@ def generate_qr(location_id):
             qr_img.save(qr_img_bytes, format='PNG')
             qr_img_bytes.seek(0)
             qr_img_base64 = base64.b64encode(qr_img_bytes.read()).decode('utf-8')
-
+    user_id = current_user.id  # Static for demonstration; use authenticated user's ID in production
+    is_admin = Organization.query.with_entities(func.count(Organization.id)).filter_by(user_id=user_id).scalar() > 0
+    user_locations = current_user.locations
     return render_template(
         'generated.html',
         qr_data=qr.qr_data,
         qr_image=qr_img_base64,
         location=location,
         organization=organization,
-        name=current_user.username
+        name=current_user.username,
+        is_admin=is_admin,
+        is_member=user_locations
     )
 
 @views.route('/set_deadline/<int:location_id>', methods=['GET', 'POST'])
@@ -489,8 +525,15 @@ def set_deadline(location_id):
         db.session.commit()
         flash('Deadline updated successfully!', 'success')
         return redirect(url_for('views.set_deadline', location_id=location.id))
-
-    return render_template('set_deadline.html', location=location,name=current_user.username)
+    user_id = current_user.id  # Static for demonstration; use authenticated user's ID in production
+    is_admin = Organization.query.with_entities(func.count(Organization.id)).filter_by(user_id=user_id).scalar() > 0
+    user_locations = current_user.locations
+    return render_template('set_deadline.html',
+                            location=location,
+                            name=current_user.username,
+                            is_admin=is_admin,
+                            is_member=user_locations
+                            )
 
 @views.route('/regenerate_qr/<int:location_id>', methods=['POST','GET'])
 @login_required
@@ -549,14 +592,18 @@ def regenerate_qr(location_id):
             qr_img.save(qr_img_bytes, format='PNG')
             qr_img_bytes.seek(0)
             qr_img_base64 = base64.b64encode(qr_img_bytes.read()).decode('utf-8')
-
+    user_id = current_user.id  # Static for demonstration; use authenticated user's ID in production
+    is_admin = Organization.query.with_entities(func.count(Organization.id)).filter_by(user_id=user_id).scalar() > 0
+    user_locations = current_user.locations
     return render_template(
         'generated.html',
         qr_data=qr.qr_data,
         qr_image=qr_img_base64,
         location=location,
         organization=organization,
-        name=current_user.username
+        name=current_user.username,
+        is_admin=is_admin,
+        is_member=user_locations
     )
 
 @views.route('/pre', methods=['GET', 'POST'])
@@ -579,10 +626,15 @@ def pre():
         action = "Clock In"
         url = url_for('views.clock_in')
 
+    user_id = current_user.id  # Static for demonstration; use authenticated user's ID in production
+    is_admin = Organization.query.with_entities(func.count(Organization.id)).filter_by(user_id=user_id).scalar() > 0
+    user_locations = current_user.locations
     return render_template('pre-clockin.html'
                            , action=action,
                              url=url,
-                             name=current_user.username
+                             name=current_user.username,
+                             is_admin=is_admin,
+                            is_member=user_locations
                              )
 
 @views.route('/process_qr_code', methods=['POST', 'GET'])
@@ -785,6 +837,9 @@ def attendance_log():
 
     if not selected_org_id and not selected_location_id:
         # No organization selected, so no attendance records to display
+        user_id = current_user.id  # Static for demonstration; use authenticated user's ID in production
+        is_admin = Organization.query.with_entities(func.count(Organization.id)).filter_by(user_id=user_id).scalar() > 0
+        user_locations = current_user.locations
         return render_template('attendance_log.html',
                                organizations=organizations,
                                selected_org_id=selected_org_id,
@@ -793,7 +848,9 @@ def attendance_log():
                                name=current_user.username,
                                timezone= user_timezone,
                                current_date=current_time.strftime('%d-%m-%Y'),
-                               current_time=current_time.strftime('%I:%M:%S %p %Z')
+                               current_time=current_time.strftime('%I:%M:%S %p %Z'),
+                               is_admin=is_admin,
+                                is_member=user_locations
                                )
 
     # Convert attendance times to user's local timezone
@@ -822,7 +879,9 @@ def attendance_log():
             date_obj = datetime.strptime(selected_date, '%Y-%m-%d')
             query = query.filter(db.func.date(Attendance.clock_in_time) == date_obj)
 
-
+    user_id = current_user.id  # Static for demonstration; use authenticated user's ID in production
+    is_admin = Organization.query.with_entities(func.count(Organization.id)).filter_by(user_id=user_id).scalar() > 0
+    user_locations = current_user.locations
     return render_template(
         'attendance_log.html',
         attendances=attendances,
@@ -834,7 +893,9 @@ def attendance_log():
         current_time=current_time.strftime('%I:%M:%S %p %Z'),
         selected_status=selected_status,
         selected_date=selected_date,
-        timezone= user_timezone
+        timezone= user_timezone,
+        is_admin=is_admin,
+        is_member=user_locations
     )
 
 
@@ -928,11 +989,16 @@ def set_timezone():
     # Get user's current timezone
     user_timezone = current_user.timezone
 
+    user_id = current_user.id  # Static for demonstration; use authenticated user's ID in production
+    is_admin = Organization.query.with_entities(func.count(Organization.id)).filter_by(user_id=user_id).scalar() > 0
+    user_locations = current_user.locations
     return render_template(
         'settings.html',
         timezones=TIMEZONES,
         user_timezone=user_timezone,
-        name=current_user.username
+        name=current_user.username,
+        is_admin=is_admin,
+        is_member=user_locations
         )
 
 

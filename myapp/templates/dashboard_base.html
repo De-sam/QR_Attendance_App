@@ -311,11 +311,18 @@
 				{% block content %}
 				{% if not is_member and not is_admin %}
 				<h3> Hi {{name}}</h3>
-				<p> You need to create or join an organisation to continue</p>
+				<p> You have not create or joined any available organisations, to continue you must create or join an organisation</p>
 				<a href="/create_org"  class="btn btn-outline-danger btn-sm">
+					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-buildings" viewBox="0 0 16 16">
+						<path d="M14.763.075A.5.5 0 0 1 15 .5v15a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5V14h-1v1.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V10a.5.5 0 0 1 .342-.474L6 7.64V4.5a.5.5 0 0 1 .276-.447l8-4a.5.5 0 0 1 .487.022M6 8.694 1 10.36V15h5zM7 15h2v-1.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5V15h2V1.309l-7 3.5z"/>
+						<path d="M2 11h1v1H2zm2 0h1v1H4zm-2 2h1v1H2zm2 0h1v1H4zm4-4h1v1H8zm2 0h1v1h-1zm-2 2h1v1H8zm2 0h1v1h-1zm2-2h1v1h-1zm0 2h1v1h-1zM8 7h1v1H8zm2 0h1v1h-1zm2 0h1v1h-1zM8 5h1v1H8zm2 0h1v1h-1zm2 0h1v1h-1zm0-2h1v1h-1z"/>
+					</svg>
 					Create organisation
 				</a>
 				<a href="/join_org" class="btn btn-danger btn-sm"> 
+					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cursor" viewBox="0 0 16 16">
+						<path d="M14.082 2.182a.5.5 0 0 1 .103.557L8.528 15.467a.5.5 0 0 1-.917-.007L5.57 10.694.803 8.652a.5.5 0 0 1-.006-.916l12.728-5.657a.5.5 0 0 1 .556.103zM2.25 8.184l3.897 1.67a.5.5 0 0 1 .262.263l1.67 3.897L12.743 3.52z"/>
+					  </svg>
 					Join organisation
 				</a>
 				{% endif %}
@@ -332,7 +339,9 @@
 										<path d="M2 1a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1zm11 0H3v14h3v-2.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5V15h3z"/>
 									  </svg>
 									<h5 class="card-title">{{ organization_count }}</h5>
-									<p class="card-text"><a href="/manage_org" style="text-decoration: none; color: white;">Number of times absent this week</a></p>
+									<p class="card-text">
+										<a href="#" style="text-decoration: none; color: white;">Undefined</a>
+									</p>
 								</div>
 							</div>
 						</div>
@@ -347,7 +356,7 @@
 									  </svg>
 									<h5 class="card-title">{{ location_count }}</h5>
 									<p class="card-text">
-										<a href="#" style="text-decoration: none; color: white;">Number of times present this week</a>
+										<a href="#" style="text-decoration: none; color: white;">Undefined</a>
 							
 									</p>
 								</div>
@@ -365,7 +374,7 @@
 										  </svg>
 										<h5 class="card-title">{{total_present}}</h5>
 										<p class="card-text">
-											Total present today
+											Total Undefined
 										</p>
 									</div>	
 									<div class="border-start border-white mx-3" style="height: 70px;"></div> 
@@ -378,7 +387,7 @@
 										<h5 class="card-title">
 											{{total_absent}}
 										</h5>
-										<p class="card-text">total absent today</p>
+										<p class="card-text">Total Undefined</p>
 									</div>
 								</div>
 							</div>
