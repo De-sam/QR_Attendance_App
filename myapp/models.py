@@ -5,6 +5,8 @@ from . import db
 from flask_login import UserMixin
 import pytz
 from datetime import datetime
+from flask_sqlalchemy import SQLAlchemy
+
 
 # Association table for the many-to-many relationship between Users and Locations
 user_locations = db.Table('user_locations',
