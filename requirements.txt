@@ -112,6 +112,6 @@ URLObject==2.4.3
 wcwidth==0.2.13
 weasyprint==62.1
 webencodings==0.5.1
-Werkzeug==2.2.2
+Werkzeug==3.0.3
 yarg==0.1.9
 zopfli==0.2.3
