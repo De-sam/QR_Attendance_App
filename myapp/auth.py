@@ -1,5 +1,5 @@
 from flask import Blueprint, session, render_template, request, flash, redirect, url_for
-from . import db, google
+from . import db, oauth
 from .models import User
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -11,25 +11,17 @@ auth = Blueprint("auth", __name__)
 # Google OAuth routes
 @auth.route('/login/google')
 def login_google():
-    return google.authorize(callback=url_for('auth.authorized', _external=True))
+    redirect_uri = url_for('auth.authorized', _external=True)
+    return oauth.google.authorize_redirect(redirect_uri)
 
 @auth.route('/login/callback')
 def authorized():
-    response = google.authorized_response()
-    if response is None or response.get('access_token') is None:
-        flash('Access denied: reason={} error={}'.format(
-            request.args['error_reason'],
-            request.args['error_description']
-        ), 'danger')
-        return redirect(url_for('auth.login'))
-
-    session['google_token'] = (response['access_token'], '')
-    user_info = google.get('userinfo')
-    email = user_info.data['email']
+    token = oauth.google.authorize_access_token()
+    user_info = oauth.google.parse_id_token(token)
+    email = user_info['email']
 
     user = User.query.filter_by(email=email).first()
     if not user:
-        # Create a new user if not exists
         user = User(email=email, username=email.split('@')[0])
         db.session.add(user)
         db.session.commit()
@@ -38,10 +30,6 @@ def authorized():
     session.permanent = True
     session['last_activity'] = datetime.now()
     return redirect(url_for('views.dashboard'))
-
-@google.tokengetter
-def get_google_oauth_token():
-    return session.get('google_token')
 
 @auth.route("/login", methods=['GET', 'POST'])
 def login():

@@ -8,11 +8,12 @@ from dotenv import load_dotenv
 import psycopg2 
 import pytz
 from datetime import datetime 
-from flask_oauthlib.client import OAuth
+from authlib.integrations.flask_client import OAuth
 
 
 load_dotenv()
 db = SQLAlchemy()
+oauth = OAuth()
 
 print("SECRET_KEY:", os.getenv('SECRET_KEY'))
 print("DATABASE_URL:", os.getenv('DATABASE_URL'))
@@ -38,21 +39,18 @@ def create_app():
     db.init_app(app)
     migrate = Migrate(app, db)
    
-    oauth = OAuth(app)
-    google = oauth.remote_app(
+    oauth.init_app(app)
+    oauth.register(
         'google',
-        consumer_key=os.getenv('GOOGLE_CLIENT_ID'),
-        consumer_secret=os.getenv('GOOGLE_CLIENT_SECRET'),
-        request_token_params={
-            'scope': 'email',
-        },
-        base_url='https://www.googleapis.com/oauth2/v1/',
-        request_token_url=None,
-        access_token_method='POST',
-        access_token_url='https://accounts.google.com/o/oauth2/token',
+        client_id=os.getenv('GOOGLE_CLIENT_ID'),
+        client_secret=os.getenv('GOOGLE_CLIENT_SECRET'),
         authorize_url='https://accounts.google.com/o/oauth2/auth',
+        authorize_params=None,
+        access_token_url='https://accounts.google.com/o/oauth2/token',
+        access_token_params=None,
+        client_kwargs={'scope': 'openid profile email'},
+        server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
     )
-
 
     from .views import views
     from .auth import auth
