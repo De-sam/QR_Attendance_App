@@ -29,6 +29,7 @@ class User(db.Model, UserMixin):
     can_update_timezone = db.Column(db.Boolean, default=False, nullable=True)
     timezone = db.Column(db.String(50), nullable=False, default='UTC')  # Added timezone field with default value
     google_id = db.Column(db.String(100), unique=True)  # Added google_id field
+    profile_image_url = db.Column(db.String(255), nullable=True) 
 
     def set_timezone(self, timezone):
         """Set the user's timezone, ensuring it is valid."""
