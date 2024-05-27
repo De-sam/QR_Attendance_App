@@ -1,0 +1,3 @@
+Requirement already satisfied: SQLAlchemy in ./virtenv/lib/python3.12/site-packages (2.0.30)
+Requirement already satisfied: typing-extensions>=4.6.0 in ./virtenv/lib/python3.12/site-packages (from SQLAlchemy) (4.12.0)
+Requirement already satisfied: greenlet!=0.4.17 in ./virtenv/lib/python3.12/site-packages (from SQLAlchemy) (3.0.3)

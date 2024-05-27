@@ -129,25 +129,21 @@ def callback_google():
             google_id = user_info.get('id')
             email = user_info.get('email')
             username = user_info.get('name')
-            profile_image_url = user_info.get('picture')  # Get the profile image URL
-
             # Check if the user exists in the database based on email
             user = User.query.filter_by(email=email).first()
 
             if user:
                 # Update the existing user's Google ID and other info if different
-                if user.google_id != google_id or user.username != username or user.profile_image_url != profile_image_url:
+                if user.google_id != google_id or user.username != username:
                     user.google_id = google_id
                     user.username = username
-                    user.profile_image_url = profile_image_url
                     db.session.commit()
             else:
                 # Create a new user if they don't exist
                 user = User(
                     username=username,
                     email=email,
-                    google_id=google_id,
-                    profile_image_url=profile_image_url
+                    google_id=google_id
                 )
                 db.session.add(user)
                 db.session.commit()
@@ -155,7 +151,7 @@ def callback_google():
             # Log the user in
             login_user(user, remember=True)
 
-            return redirect(url_for('views.dashboard',profile_image_url=user.profile_image_url))
+            return redirect(url_for('views.dashboard'))
 
     flash('Failed to log in with Google.', 'danger')
     return redirect(url_for('auth.login'))

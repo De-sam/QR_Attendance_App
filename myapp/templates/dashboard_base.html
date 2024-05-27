@@ -184,15 +184,7 @@
 					<use xlink:href="#icon-user"></use>
 				</svg> -->
 
-				<!-- Assuming 'name' is the user's username -->
-				{% if current_user.is_authenticated %}
-				<!-- If user is authenticated, use the Google profile image -->
-				<img class="profile_image" src='{{ current_user.profile_image_url }}' alt="profile image">
-				{% else %}
-				<!-- If user is not authenticated, use the default profile image API -->
-				<img class="profile_image" src='https://api.dicebear.com/7.x/micah/svg?seed={{ name }}' alt="profile image">
-				{% endif %}
-
+				<img class="profile_image" src='https://api.dicebear.com/7.x/micah/svg?seed={{name}}'' alt="profile image">
 			</a>
 		</nav>
 	</header> <!-- main-header -->
