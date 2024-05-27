@@ -101,14 +101,14 @@ def log_out():
 
 @auth.route('/login/google')
 def login_google():
-    redirect_uri = url_for('auth.callback_google', _external=True)
+    redirect_uri = "https://on-time-eapn.onrender.com/callback/google"
     auth_url = f"{google_oauth_url}auth?response_type=code&client_id={google_client_id}&redirect_uri={redirect_uri}&scope=email%20profile"
     return redirect(auth_url)
 
 @auth.route('/callback/google')
 def callback_google():
     code = request.args.get('code')
-    redirect_uri = url_for('auth.callback_google', _external=True)
+    redirect_uri = "https://on-time-eapn.onrender.com/callback/google"
     token_url = f"{google_oauth_url}token"
     token_params = {
         'code': code,
