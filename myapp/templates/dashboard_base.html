@@ -183,8 +183,11 @@
 				<!-- <svg>
 					<use xlink:href="#icon-user"></use>
 				</svg> -->
-
-				<img class="profile_image" src='{{ current_user.profile_image_url }}' alt="profile image">
+				{% if current_user.profile_image_url %}
+				<img class="profile_image" src="{{ current_user.profile_image_url }}" alt="profile image">
+				{% else %}
+				<img class="profile_image" src='https://api.dicebear.com/7.x/micah/svg?seed={{name}}'' alt="profile image">
+				{% endif %}
 			</a>
 		</nav>
 	</header> <!-- main-header -->
