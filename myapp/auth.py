@@ -129,10 +129,16 @@ def callback_google():
             google_id = user_info.get('id')
             email = user_info.get('email')
             username = user_info.get('name')
-            # Check if the user exists in the database
-            user = User.query.filter_by(google_id=google_id).first()
+            # Check if the user exists in the database based on email
+            user = User.query.filter_by(email=email).first()
 
-            if not user:
+            if user:
+                # Update the existing user's Google ID and other info if different
+                if user.google_id != google_id or user.username != username:
+                    user.google_id = google_id
+                    user.username = username
+                    db.session.commit()
+            else:
                 # Create a new user if they don't exist
                 user = User(
                     username=username,
