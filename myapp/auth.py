@@ -8,16 +8,11 @@ from google.oauth2 import id_token
 from google.auth.transport import requests
 import psycopg2 
 from datetime import datetime, timedelta
-from flask_oauthlib.client import OAuth
-from oauth2client.client import flow_from_clientsecrets
-from oauth2client.client import FlowExchangeError
+import requests
 import os
 
 auth = Blueprint("auth", __name__)
 
-# Initialize OAuth
-oauth = OAuth()
-oauth.init_app(auth)
 
 # Configure Google OAuth
 google_client_id = os.getenv('GOOGLE_CLIENT_ID')
@@ -26,16 +21,9 @@ google_client_secret = os.getenv('GOOGLE_CLIENT_SECRET')
 if not google_client_id or not google_client_secret:
     raise ValueError("No Google OAuth credentials set for Flask application")
 
-google = oauth.remote_app(
-    'google',
-    consumer_key=google_client_id,
-    consumer_secret=google_client_secret,
-    request_token_params={'scope': 'email profile'},
-    base_url='https://www.googleapis.com/oauth2/v1/',
-    access_token_method='POST',
-    access_token_url='https://accounts.google.com/o/oauth2/token',
-    authorize_url='https://accounts.google.com/o/oauth2/auth',
-)
+google_oauth_url = 'https://accounts.google.com/o/oauth2/'
+google_userinfo_url = 'https://www.googleapis.com/oauth2/v1/userinfo'
+
 
 @auth.route("/login", methods=['GET', 'POST'])
 def login():
@@ -113,38 +101,51 @@ def log_out():
 
 @auth.route('/login/google')
 def login_google():
-    callback_url = url_for('auth.callback_google', _external=True)
-    return google.authorize(callback=callback_url)
+    redirect_uri = url_for('auth.callback_google', _external=True)
+    auth_url = f"{google_oauth_url}auth?response_type=code&client_id={google_client_id}&redirect_uri={redirect_uri}&scope=email%20profile"
+    return redirect(auth_url)
 
 @auth.route('/callback/google')
-@google.authorized_handler
-def callback_google(resp):
-    if resp is None:
-        flash('You denied the request to sign in.')
-        return redirect(url_for('auth.login'))
-
-    access_token = resp['access_token']
-    google_id = resp['id_token']['sub']
-
-    # Extract user information from the ID token
-    user_info = google.get('https://www.googleapis.com/oauth2/v1/userinfo').data
-    username = user_info.get('name')
-    email = user_info.get('email')
-
-    # Check if the user exists in the database
-    user = User.query.filter_by(google_id=google_id).first()
-
-    if not user:
-        # Create a new user if they don't exist
-        user = User(
-            username=username,
-            email=email,
-            google_id=google_id
+def callback_google():
+    code = request.args.get('code')
+    redirect_uri = url_for('auth.callback_google', _external=True)
+    token_url = f"{google_oauth_url}token"
+    token_params = {
+        'code': code,
+        'client_id': google_client_id,
+        'client_secret': google_client_secret,
+        'redirect_uri': redirect_uri,
+        'grant_type': 'authorization_code'
+    }
+    response = requests.post(token_url, data=token_params)
+    if response.status_code == 200:
+        access_token = response.json()['access_token']
+        userinfo_response = requests.get(
+            google_userinfo_url,
+            headers={'Authorization': f'Bearer {access_token}'}
         )
-        db.session.add(user)
-        db.session.commit()
+        if userinfo_response.status_code == 200:
+            user_info = userinfo_response.json()
+            google_id = user_info.get('id')
+            email = user_info.get('email')
+            username = user_info.get('name')
+            # Check if the user exists in the database
+            user = User.query.filter_by(google_id=google_id).first()
 
-    # Log the user in
-    login_user(user, remember=True)
+            if not user:
+                # Create a new user if they don't exist
+                user = User(
+                    username=username,
+                    email=email,
+                    google_id=google_id
+                )
+                db.session.add(user)
+                db.session.commit()
 
-    return redirect(url_for('views.dashboard'))
+            # Log the user in
+            login_user(user, remember=True)
+
+            return redirect(url_for('views.dashboard'))
+
+    flash('Failed to log in with Google.', 'danger')
+    return redirect(url_for('auth.login'))
