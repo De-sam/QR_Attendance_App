@@ -112,16 +112,35 @@ def dashboard():
     
     ## Query to get attendance records for the current user for the last five days
     user_attendance_records = Attendance.query.filter(
-        Attendance.user_id == user_id,
-        Attendance.clock_in_time >= five_days_ago,
-        Attendance.clock_in_time <= today
-    ).all()
+    db.func.date(Attendance.clock_in_time) >= five_days_ago,
+    db.func.date(Attendance.clock_in_time) <= today,
+    Attendance.location_id.in_(location.id for location in user_locations)
+).all()
 
     # Debugging: Print attendance records to verify query results
     print(f"Attendance records for the last 5 days for user {user_id}:")
+    
     for attendance in user_attendance_records:
         print(f"Date: {attendance.clock_in_time}, Status: {attendance.status}")
+    today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+    today_end = today_start + timedelta(days=1)
 
+    attendance = Attendance.query.filter(
+        Attendance.user_id == current_user.id,
+        Attendance.clock_in_time >= today_start,
+        Attendance.clock_in_time < today_end
+    ).order_by(Attendance.clock_in_time.desc()).first()
+
+    if attendance and not attendance.clock_out_time:
+        action = "Clock Out"
+        url = url_for('views.clock_in')
+    else:
+        action = "Clock In"
+        url = url_for('views.clock_in')
+
+    user_id = current_user.id  # Static for demonstration; use authenticated user's ID in production
+    is_admin = Organization.query.with_entities(func.count(Organization.id)).filter_by(user_id=user_id).scalar() > 0
+    user_locations = current_user.locations
     return render_template(
         'dashboard_base.html',
         name=current_user.username,
@@ -136,6 +155,8 @@ def dashboard():
         total_absent=total_absent,
         is_admin=is_admin,
         is_member=user_locations,
+        action=action,
+        url=url,
         user_attendance_records=user_attendance_records
     )
 
