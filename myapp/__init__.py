@@ -6,7 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from dotenv import load_dotenv
 import pytz
-from datetime import datetime 
+from datetime import datetime,timedelta
 
 
 
@@ -30,6 +30,8 @@ def create_app():
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SESSION_COOKIE_SECURE'] = True
     app.config['SESSION_COOKIE_SAMESITE'] = 'Strict'
+    app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
+    app.config['Last_activity'] = datetime.now()
 
 # Set the timezone for the Flask application
     app.config['TIMEZONE'] = 'Africa/Lagos'

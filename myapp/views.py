@@ -24,7 +24,6 @@ views = Blueprint("views", __name__)
 
 @views.before_request
 def before_request():
-    session.permanent = True
     session.modified = True
     permanent_session_lifetime = current_app.config['PERMANENT_SESSION_LIFETIME']
     if 'last_activity' in session:

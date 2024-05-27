@@ -1,0 +1,6 @@
+Requirement already satisfied: alembic in ./virtenv/lib/python3.12/site-packages (1.13.1)
+Requirement already satisfied: SQLAlchemy>=1.3.0 in ./virtenv/lib/python3.12/site-packages (from alembic) (2.0.30)
+Requirement already satisfied: Mako in ./virtenv/lib/python3.12/site-packages (from alembic) (1.3.5)
+Requirement already satisfied: typing-extensions>=4 in ./virtenv/lib/python3.12/site-packages (from alembic) (4.12.0)
+Requirement already satisfied: greenlet!=0.4.17 in ./virtenv/lib/python3.12/site-packages (from SQLAlchemy>=1.3.0->alembic) (3.0.3)
+Requirement already satisfied: MarkupSafe>=0.9.2 in ./virtenv/lib/python3.12/site-packages (from Mako->alembic) (2.1.5)

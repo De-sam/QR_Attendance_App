@@ -1,0 +1,5 @@
+Requirement already satisfied: google-auth in ./virtenv/lib/python3.12/site-packages (2.29.0)
+Requirement already satisfied: cachetools<6.0,>=2.0.0 in ./virtenv/lib/python3.12/site-packages (from google-auth) (5.3.3)
+Requirement already satisfied: pyasn1-modules>=0.2.1 in ./virtenv/lib/python3.12/site-packages (from google-auth) (0.4.0)
+Requirement already satisfied: rsa<5,>=3.1.4 in ./virtenv/lib/python3.12/site-packages (from google-auth) (4.9)
+Requirement already satisfied: pyasn1<0.7.0,>=0.4.6 in ./virtenv/lib/python3.12/site-packages (from pyasn1-modules>=0.2.1->google-auth) (0.6.0)

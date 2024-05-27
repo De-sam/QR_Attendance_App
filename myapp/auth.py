@@ -52,7 +52,6 @@ def login():
 
         if user and check_password_hash(user.password, password):
             login_user(user, remember=True)
-            session.permanent = True
             session['last_activity'] = datetime.now()
             return redirect(url_for('views.dashboard'))
         else:

@@ -1,2 +1,0 @@
-Requirement already satisfied: Werkzeug in ./virenv/lib/python3.12/site-packages (2.2.2)
-Requirement already satisfied: MarkupSafe>=2.1.1 in ./virenv/lib/python3.12/site-packages (from Werkzeug) (2.1.5)
