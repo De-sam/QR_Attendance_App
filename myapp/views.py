@@ -88,7 +88,11 @@ def dashboard():
 
     # Get the current date
     today = date.today()
-    
+    five_days_ago = today - timedelta(days=5)
+
+    print(f"Today's date: {today}")
+    print(f"Date 5 days ago: {five_days_ago}")
+
     # Get the locations the current user is a member of
     user_locations = current_user.locations
     
@@ -105,6 +109,19 @@ def dashboard():
     
     total_absent= total_members - total_present
 
+    
+    ## Query to get attendance records for the current user for the last five days
+    user_attendance_records = Attendance.query.filter(
+        Attendance.user_id == user_id,
+        Attendance.clock_in_time >= five_days_ago,
+        Attendance.clock_in_time <= today
+    ).all()
+
+    # Debugging: Print attendance records to verify query results
+    print(f"Attendance records for the last 5 days for user {user_id}:")
+    for attendance in user_attendance_records:
+        print(f"Date: {attendance.clock_in_time}, Status: {attendance.status}")
+
     return render_template(
         'dashboard_base.html',
         name=current_user.username,
@@ -118,7 +135,8 @@ def dashboard():
         total_present=total_present,
         total_absent=total_absent,
         is_admin=is_admin,
-        is_member=user_locations
+        is_member=user_locations,
+        user_attendance_records=user_attendance_records
     )
 
 
@@ -221,7 +239,14 @@ def join_org():
         organization = Organization.query.filter_by(code=code).first()
         if organization:
             locations = Location.query.filter_by(organization_id=organization.id).all()
-            return render_template('join_org.html', organization=organization, locations=locations)
+            user_id = current_user.id  # Static for demonstration; use authenticated user's ID in production
+            is_admin = Organization.query.with_entities(func.count(Organization.id)).filter_by(user_id=user_id).scalar() > 0
+            user_locations = current_user.locations
+            return render_template('join_org.html', 
+                                    organization=organization,
+                                    locations=locations,
+                                    is_admin= is_admin,
+                                    is_member = user_locations)
         else:
             flash('No organization found with the provided code..', category='warning')
             return redirect(url_for('views.join_org'))

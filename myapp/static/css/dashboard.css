@@ -11,7 +11,7 @@
 	--primary-base: #358FE6;
 
 	--extras-sun: #FFD371;
-	--extras-moon: #7190FF;
+	--extras-moon: red;
 	--extras-black-alpha-64: rgb(0 0 0 / .64);
 	--extras-white-alpha-64: rgb(255 255 255 / .64);
 }
@@ -82,10 +82,10 @@ body {
   }
 
 .profile_image{
-	height: 30px;
-	width: 30px;
+	height: 40px;
+	width: 40px;
 	border-radius: 20px;
-	border: white solid 2px;
+	border: white solid 3px;
 }
 
 .row {

@@ -360,8 +360,23 @@
 									<h5 class="card-title">{{ location_count }}</h5>
 									<p class="card-text">
 										<a href="#" style="text-decoration: none; color: white;">Undefined</a>
-							
+									
 									</p>
+									{% if user_attendance_records %}
+										<h3>Your Attendance Records for the Last 5 Days</h3>
+										{% for attendance in user_attendance_records %}
+											<div>
+												<p>Name: {{ attendance.user.username }}</p>
+												<p>Date: {{ attendance.clock_in_time.strftime('%Y-%m-%d') }}</p>
+												<p>Clock In Time: {{ attendance.clock_in_time.strftime('%I:%M:%S %p') }}</p>
+												<p>Clock Out Time: {{ attendance.clock_out_time.strftime('%I:%M:%S %pS') if attendance.clock_out_time else 'N/A' }}</p>
+												<p>Status: {{ attendance.status }}</p>
+											</div>
+										{% endfor %}
+									{% else %}
+										<p>No attendance records for the last 5 days.</p>
+									{% endif %}
+
 								</div>
 							</div>
 						</div>
