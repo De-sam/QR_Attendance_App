@@ -86,8 +86,25 @@ def dashboard():
 
     has_results = bool(member_details)
 
+    user_timezone = current_user.timezone    
+
+   
+    
+    if current_user.timezone:
+        tz = pytz.timezone(current_user.timezone)
+        current_time = datetime.now(tz)
+    else:
+        current_time = datetime.now(pytz.utc)
+
+    user_timezone = current_user.timezone
+    if user_timezone:
+        user_tz = pytz.timezone(user_timezone)
+    else:
+        user_tz = pytz.utc
+
+
     # Get the current date
-    today = date.today()
+    today = date.today(user_tz)
     five_days_ago = today - timedelta(days=5)
 
     print(f"Today's date: {today}")
