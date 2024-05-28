@@ -99,6 +99,12 @@ def dashboard():
     today = current_time.date()
     five_days_ago = today - timedelta(days=5)
     
+     ## Query to get attendance records for the current user for the last five days
+    user_attendance_records = Attendance.query.filter(
+        db.func.date(db.func.timezone(user_timezone, Attendance.clock_in_time)) >= five_days_ago,
+        db.func.date(db.func.timezone(user_timezone, Attendance.clock_in_time)) <= today,
+        Attendance.location_id.in_(location.id for location in user_locations)
+    ).all()
     
     # Get the locations the current user is a member of
     user_locations = current_user.locations
@@ -117,12 +123,7 @@ def dashboard():
     total_absent= total_members - total_present
 
     
-    ## Query to get attendance records for the current user for the last five days
-    user_attendance_records = Attendance.query.filter(
-        db.func.date(db.func.timezone(user_timezone, Attendance.clock_in_time)) >= five_days_ago,
-        db.func.date(db.func.timezone(user_timezone, Attendance.clock_in_time)) <= today,
-        Attendance.location_id.in_(location.id for location in user_locations)
-    ).all()
+   
 
     # Debugging: Print attendance records to verify query results
     print(f"Attendance records for the last 5 days for user {user_id}:")
