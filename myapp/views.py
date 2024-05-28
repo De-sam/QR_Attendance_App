@@ -104,7 +104,7 @@ def dashboard():
 
 
     # Get the current date
-    today = date.today(user_tz)
+    today = date.today()
     five_days_ago = today - timedelta(days=5)
 
     print(f"Today's date: {today}")
