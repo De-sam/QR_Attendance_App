@@ -329,13 +329,33 @@
 					Join organisation
 				</a>
 				{% endif %}
-				{% if is_member %}
-				<div class="container mt-5">
-					<div class="row g-3"> 
+						<div class="container mt-5">
+							<div class="row g-3"> 
+							<!-- Card 2 -->
+								<div class="col-md-12">
+								<div class="card text-white bg-dark mb-3" style=" border: 1px solid goldenrod;">
+									<div class="card-body text-center d-flex justify-content-around align-items-center">
+										<div>
+											{% if is_admin %}
+											<p class="card-text">You are the administrator of:</p>
+											{% endif %}
+										</div>
+										<div class="border-start border-white mx-4" style="height: 25px;"></div> 
+									<!-- Vertical Divider -->
+										<div>
+											{% if is_member %}
+											<p class="card-text">You are a member of:</p>
+											{% endif %}
+										</div>
+
+									</div>
+								</div>
+							</div>
+						{% if is_member %}
 						<!-- First Card -->
 						 	
-						<div class="col-md-4">
-							<div class="card text-white bg-dark mb-3" style="height: 200px; border-left: 4px solid goldenrod;">
+						<div class="col-md-3">
+							<div class="card text-white bg-dark mb-3" style=" border-left: 4px solid goldenrod;">
 								<div class="card-body text-center">
 									<p>clock-in/clock-out</p>
 									<div style="display: flex; align-items: center; justify-content: center; margin-top: 10px;">
@@ -357,48 +377,9 @@
 								</div>
 							</div>
 						</div>
-						
-						
-						
-						
-						<!-- Second Card -->
-						<div class="col-md-6">
-							<div class="card text-white bg-dark mb-6" style="height: 200px; border-left: 4px solid goldenrod;">
-								<div class="card-body" style="display: flex; align-items: center;" >
-									<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-receipt" viewBox="0 0 16 16" style="margin-right: 10px;">
-										<path d="M1.92.506a.5.5 0 0 1 .434.14L3 1.293l.646-.647a.5.5 0 0 1 .708 0L5 1.293l.646-.647a.5.5 0 0 1 .708 0L7 1.293l.646-.647a.5.5 0 0 1 .708 0L9 1.293l.646-.647a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .801.13l.5 1A.5.5 0 0 1 15 2v12a.5.5 0 0 1-.053.224l-.5 1a.5.5 0 0 1-.8.13L13 14.707l-.646.647a.5.5 0 0 1-.708 0L11 14.707l-.646.647a.5.5 0 0 1-.708 0L9 14.707l-.646.647a.5.5 0 0 1-.708 0L7 14.707l-.646.647a.5.5 0 0 1-.708 0L5 14.707l-.646.647a.5.5 0 0 1-.708 0L3 14.707l-.646.647a.5.5 0 0 1-.801-.13l-.5-1A.5.5 0 0 1 1 14V2a.5.5 0 0 1 .053-.224l.5-1a.5.5 0 0 1 .367-.27m.217 1.338L2 2.118v11.764l.137.274.51-.51a.5.5 0 0 1 .707 0l.646.647.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.509.509.137-.274V2.118l-.137-.274-.51.51a.5.5 0 0 1-.707 0L12 1.707l-.646.647a.5.5 0 0 1-.708 0L10 1.707l-.646.647a.5.5 0 0 1-.708 0L8 1.707l-.646.647a.5.5 0 0 1-.708 0L6 1.707l-.646.647a.5.5 0 0 1-.708 0L4 1.707l-.646.647a.5.5 0 0 1-.708 0z"/>
-										<path d="M3 4.5a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5m8-6a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5"/>
-									  </svg>
-									<h3 style="font-size: medium; margin-bottom: 0px;">Your Attendance Records In the Last 5 Days</h3>
-								</div>
-								<hr style="margin-top: 0%;margin-bottom: 0%;">
-								<div class="card-body" style="max-height: 200px; overflow-y: scroll; padding-top: 0%;">
-									{% if user_attendance_records %}
-										<ul class="list-group list-group-flush"></ul>
-										{% for attendance in user_attendance_records %}
-											<p style="font-size: x-small; margin-bottom: 0%;">{{ attendance.clock_in_time.strftime('%B %d, %Y') }}:</p>
-											<p style="font-size: x-small;">
-												Clocked in: {{ attendance.clock_in_time.strftime('%I:%M:%S %p') }},
-												Clocked out: {{ attendance.clock_out_time.strftime('%I:%M:%S %p') if attendance.clock_out_time else 'N/A' }} |
-												<span style="color: {{ 'green' if attendance.status == 'Early' else 'red' }};">{{ attendance.status }}</span>
-											</p>
-											
-											{% if not loop.last %}
-												<hr style="margin-top: 5px; margin-bottom: 5px;">
-											{% endif %}
-										{% endfor %}
-									{% else %}
-										<p>No attendance records for the last 5 days.</p>
-									{% endif %}
-								</div>
-							</div>
-						</div>
-						
-						
-						
-						<!-- Third Card -->
-						<div class="col-md-2">
-							<div class="card text-white bg-dark mb-3">
+						<!-- Second  Card -->
+						<div class="col-md-4">
+							<div class="card text-white bg-dark mb-3" style=" border-left: 4px solid goldenrod;">
 								<div class="card-body text-center d-flex justify-content-around align-items-center">
 									<div>
 										<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-person-check" viewBox="0 0 16 16">
@@ -425,7 +406,71 @@
 								</div>
 							</div>
 						</div>
+
+						<!-- Third Card -->
+						<div class="col-md-5">
+							<div class="card text-white bg-dark mb-3" style=" border-left: 4px solid goldenrod;">
+								<div class="card-body text-center d-flex justify-content-around align-items-center">
+									<div>
+										<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-person-check" viewBox="0 0 16 16">
+											<path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m1.679-4.493-1.335 2.226a.75.75 0 0 1-1.174.144l-.774-.773a.5.5 0 0 1 .708-.708l.547.548 1.17-1.951a.5.5 0 1 1 .858.514M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0M8 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4"/>
+											<path d="M8.256 14a4.5 4.5 0 0 1-.229-1.004H3c.001-.246.154-.986.832-1.664C4.484 10.68 5.711 10 8 10q.39 0 .74.025c.226-.341.496-.65.804-.918Q8.844 9.002 8 9c-5 0-6 3-6 4s1 1 1 1z"/>
+										  </svg>
+										<h5 class="card-title">{{total_present}}</h5>
+										<p class="card-text">
+											Total Undefined
+										</p>
+									</div>	
+									<div class="border-start border-white mx-3" style="height: 70px;"></div> 
+									<!-- Vertical Divider -->
+									<div>
+										<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-person-x" viewBox="0 0 16 16">
+											<path d="M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0M8 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4m.256 7a4.5 4.5 0 0 1-.229-1.004H3c.001-.246.154-.986.832-1.664C4.484 10.68 5.711 10 8 10q.39 0 .74.025c.226-.341.496-.65.804-.918Q8.844 9.002 8 9c-5 0-6 3-6 4s1 1 1 1z"/>
+											<path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m-.646-4.854.646.647.646-.647a.5.5 0 0 1 .708.708l-.647.646.647.646a.5.5 0 0 1-.708.708l-.646-.647-.646.647a.5.5 0 0 1-.708-.708l.647-.646-.647-.646a.5.5 0 0 1 .708-.708"/>
+										  </svg>
+										<h5 class="card-title">
+											{{total_absent}}
+										</h5>
+										<p class="card-text">Total Undefined</p>
+									</div>
+								</div>
+							</div>
+						</div>
+						
+						<!-- Forth  Card -->
+						<div class="col-md-12">
+							<div class="card text-white bg-dark mb-6" style="height: 300px; border-left: 4px solid goldenrod;">
+								<div class="card-body" style="display: flex; align-items: center;" >
+									<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-receipt" viewBox="0 0 16 16" style="margin-right: 10px;">
+										<path d="M1.92.506a.5.5 0 0 1 .434.14L3 1.293l.646-.647a.5.5 0 0 1 .708 0L5 1.293l.646-.647a.5.5 0 0 1 .708 0L7 1.293l.646-.647a.5.5 0 0 1 .708 0L9 1.293l.646-.647a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .801.13l.5 1A.5.5 0 0 1 15 2v12a.5.5 0 0 1-.053.224l-.5 1a.5.5 0 0 1-.8.13L13 14.707l-.646.647a.5.5 0 0 1-.708 0L11 14.707l-.646.647a.5.5 0 0 1-.708 0L9 14.707l-.646.647a.5.5 0 0 1-.708 0L7 14.707l-.646.647a.5.5 0 0 1-.708 0L5 14.707l-.646.647a.5.5 0 0 1-.708 0L3 14.707l-.646.647a.5.5 0 0 1-.801-.13l-.5-1A.5.5 0 0 1 1 14V2a.5.5 0 0 1 .053-.224l.5-1a.5.5 0 0 1 .367-.27m.217 1.338L2 2.118v11.764l.137.274.51-.51a.5.5 0 0 1 .707 0l.646.647.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.509.509.137-.274V2.118l-.137-.274-.51.51a.5.5 0 0 1-.707 0L12 1.707l-.646.647a.5.5 0 0 1-.708 0L10 1.707l-.646.647a.5.5 0 0 1-.708 0L8 1.707l-.646.647a.5.5 0 0 1-.708 0L6 1.707l-.646.647a.5.5 0 0 1-.708 0L4 1.707l-.646.647a.5.5 0 0 1-.708 0z"/>
+										<path d="M3 4.5a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5m8-6a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5"/>
+									  </svg>
+									<h3 style="font-size: medium;">Your Attendance Records In the Last 5 Days</h3>
+								</div>
+								<hr style="margin-top: 0%;margin-bottom: 0%;">
+								<div class="card-body" style="max-height: 350px; overflow-y: scroll; padding-top: 0%;">
+									{% if user_attendance_records %}
+										<ul class="list-group list-group-flush"></ul>
+										{% for attendance in user_attendance_records %}
+											<p style="font-size: x-small;">{{ attendance.clock_in_time.strftime('%B %d, %Y') }}:</p>
+											<p style="font-size: x-small;">
+												Clocked in: {{ attendance.clock_in_time.strftime('%I:%M:%S %p') }},
+												Clocked out: {{ attendance.clock_out_time.strftime('%I:%M:%S %p') if attendance.clock_out_time else 'N/A' }} |
+												<span style="color: {{ 'green' if attendance.status == 'Early' else 'red' }};">{{ attendance.status }}</span>
+											</p>
+											
+											{% if not loop.last %}
+												<hr style="margin-top: 5px; margin-bottom: 5px;">
+											{% endif %}
+										{% endfor %}
+									{% else %}
+										<p>No attendance records for the last 5 days.</p>
+									{% endif %}
+								</div>
+							</div>
+						</div>
 				{% endif %}
+				
 				{% if is_admin %}
 				<div class="container mt-5">
 					<div class="row g-3"> 
