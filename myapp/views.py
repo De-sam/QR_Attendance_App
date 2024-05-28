@@ -129,10 +129,10 @@ def dashboard():
     
     ## Query to get attendance records for the current user for the last five days
     user_attendance_records = Attendance.query.filter(
-    db.func.date(Attendance.clock_in_time) >= five_days_ago,
-    db.func.date(Attendance.clock_in_time) <= today,
-    Attendance.location_id.in_(location.id for location in user_locations)
-).all()
+        db.func.date(db.func.timezone(user_timezone, Attendance.clock_in_time)) >= five_days_ago,
+        db.func.date(db.func.timezone(user_timezone, Attendance.clock_in_time)) <= today,
+        Attendance.location_id.in_(location.id for location in user_locations)
+    ).all()
 
     # Debugging: Print attendance records to verify query results
     print(f"Attendance records for the last 5 days for user {user_id}:")
