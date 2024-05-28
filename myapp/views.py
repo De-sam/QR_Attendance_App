@@ -50,13 +50,11 @@ def dashboard():
     user_id = current_user.id 
     search_query = request.args.get('search', '').strip()
     user = current_user
-   
-   # Determine if the user is an admin
+
+    # Determine if the user is an admin
     is_admin = Organization.query.with_entities(func.count(Organization.id)).filter_by(user_id=user_id).scalar() > 0
     user_locations = current_user.locations
 
-
-   
     organizations = Organization.query.options(
         joinedload(Organization.locations),
         joinedload(Organization.join_requests).joinedload(JoinRequest.location)
@@ -65,29 +63,27 @@ def dashboard():
     # Filter join requests to only include pending ones for display in the dashboard
     pending_join_requests = [request for org in organizations for request in org.join_requests if request.status == 'pending']
 
-     # Only prepare member details if there are locations within these organizations
+    # Only prepare member details if there are locations within these organizations
     member_details = []
     if any(org.locations for org in organizations):
         for org in organizations:
             for location in org.locations:
                 for member in location.members:
-                     if search_query == '' or search_query.lower() in member.username.lower():
+                    if search_query == '' or search_query.lower() in member.username.lower():
                         member_details.append({
-                        'id': member.id, 
-                        'name': member.username,
-                        'email': member.email,
-                        'alias': location.alias,
-                        'organization_name': org.name,
-                        'location_id': location.id
-                    })
+                            'id': member.id, 
+                            'name': member.username,
+                            'email': member.email,
+                            'alias': location.alias,
+                            'organization_name': org.name,
+                            'location_id': location.id
+                        })
 
     organization_count = len(organizations)
     location_count = sum(len(org.locations) for org in organizations)
-
     has_results = bool(member_details)
 
     user_timezone = current_user.timezone
-
     if user_timezone:
         user_tz = pytz.timezone(user_timezone)
         current_time = datetime.now(user_tz)
@@ -98,38 +94,44 @@ def dashboard():
     # Get the current date in the user's timezone
     today = current_time.date()
     five_days_ago = today - timedelta(days=5)
-    
-     ## Query to get attendance records for the current user for the last five days
-    user_attendance_records = Attendance.query.filter(
-        db.func.date(db.func.timezone(user_timezone, Attendance.clock_in_time)) >= five_days_ago,
-        db.func.date(db.func.timezone(user_timezone, Attendance.clock_in_time)) <= today,
-        Attendance.location_id.in_(location.id for location in user_locations)
-    ).all()
-    
+
     # Get the locations the current user is a member of
     user_locations = current_user.locations
-    
+
     # Query to get today's attendance records for user's locations
     today_attendance = Attendance.query.filter(
         db.func.date(Attendance.clock_in_time) == today,
         Attendance.location.has(Location.members.contains(current_user))
     ).all()
-    
+
+    # Convert attendance times to user's timezone
+    for record in today_attendance:
+        record.clock_in_time = record.clock_in_time.astimezone(user_tz)
+        if record.clock_out_time:
+            record.clock_out_time = record.clock_out_time.astimezone(user_tz)
+
     total_members = len(member_details)
-
-    # Calculate the number of present and absent members
     total_present = sum(1 for record in today_attendance if record.is_clocked_in or record.clock_out_time is not None)
-    
-    total_absent= total_members - total_present
+    total_absent = total_members - total_present
 
-    
-   
+    # Query to get attendance records for the current user for the last five days
+    user_attendance_records = Attendance.query.filter(
+        db.func.date(db.func.timezone(user_timezone, Attendance.clock_in_time)) >= five_days_ago,
+        db.func.date(db.func.timezone(user_timezone, Attendance.clock_in_time)) <= today,
+        Attendance.location_id.in_(location.id for location in user_locations)
+    ).all()
+
+    # Convert attendance times to user's timezone for past records
+    for record in user_attendance_records:
+        record.clock_in_time = record.clock_in_time.astimezone(user_tz)
+        if record.clock_out_time:
+            record.clock_out_time = record.clock_out_time.astimezone(user_tz)
 
     # Debugging: Print attendance records to verify query results
     print(f"Attendance records for the last 5 days for user {user_id}:")
-    
     for attendance in user_attendance_records:
         print(f"Date: {attendance.clock_in_time}, Status: {attendance.status}")
+
     today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
     today_end = today_start + timedelta(days=1)
 
@@ -146,9 +148,6 @@ def dashboard():
         action = "Clock In"
         url = url_for('views.clock_in')
 
-    user_id = current_user.id  # Static for demonstration; use authenticated user's ID in production
-    is_admin = Organization.query.with_entities(func.count(Organization.id)).filter_by(user_id=user_id).scalar() > 0
-    user_locations = current_user.locations
     return render_template(
         'dashboard_base.html',
         name=current_user.username,
@@ -167,6 +166,7 @@ def dashboard():
         url=url,
         user_attendance_records=user_attendance_records
     )
+
 
 
 @views.route('/admin_only/')
