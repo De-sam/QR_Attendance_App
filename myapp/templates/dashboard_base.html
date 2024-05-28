@@ -376,12 +376,12 @@
 									{% if user_attendance_records %}
 										<ul class="list-group list-group-flush"></ul>
 										{% for attendance in user_attendance_records %}
-											<h3 style="font-size: x-small; margin-bottom: 0%;">{{ attendance.clock_in_time.strftime('%B %d, %Y') }}:</h3>
-											<h3 style="font-size: x-small;">
+											<p style="font-size: x-small; margin-bottom: 0%;">{{ attendance.clock_in_time.strftime('%B %d, %Y') }}:</p>
+											<p style="font-size: x-small;">
 												Clocked in: {{ attendance.clock_in_time.strftime('%I:%M:%S %p') }},
 												Clocked out: {{ attendance.clock_out_time.strftime('%I:%M:%S %p') if attendance.clock_out_time else 'N/A' }} |
 												<span style="color: {{ 'green' if attendance.status == 'Early' else 'red' }};">{{ attendance.status }}</span>
-											</h3>
+											</p>
 											
 											{% if not loop.last %}
 												<hr style="margin-top: 5px; margin-bottom: 5px;">
