@@ -25,7 +25,16 @@
 	
 	<!-- full calender -->
 	<link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.0/main.min.css" rel="stylesheet">
-	
+	<style>
+    /* Adjusting cell size */
+    .fc-dayGridMonth-view .fc-day,
+    .fc-dayGridMonth-view .fc-day-top {
+        width: 20px; /* Adjust width as needed */
+        height: 20px; /* Adjust height as needed */
+        font-size: 12px; /* Adjust font size as needed */
+    }
+</style>
+
 	
 	<!-- Google fonts -->
 	<link rel="preconnect" href="https://fonts.googleapis.com">
@@ -405,13 +414,14 @@
 						</div>
 						<!-- Second  Card -->
 						<div class="col-md-6">
-							<div class="card text-white bg-dark mb-3">
-								<div class="card-body text-center d-flex justify-content-around align-items-center">
+							<div class="container">
+								<div class="row">
+									<div class="col">
 									<div id="calendar"></div>
 								</div>
 							</div>
 						</div>
-						
+					</div>
 						<!-- Third Card -->
 						<div class="col-md-3">
 							<div class="card text-white bg-dark mb-3">
@@ -648,7 +658,7 @@
 			var calendarEl = document.getElementById('calendar');
 			var calendar = new FullCalendar.Calendar(calendarEl, {
 				initialView: 'dayGridMonth',
-				themeSystem: 'bootstrap',
+				themeSystem: 'bootstrap5',
  				headerToolbar: {
       			left: 'prev,next today',
      			 center: 'title',

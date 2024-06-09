@@ -186,7 +186,7 @@ body.sidebar-open #toggle-icon-close {
 	display: flex;
 	flex-direction: column;
 	gap: 4rem;
-	min-height:fit-content;
+	min-height:100%;
 	z-index: 900;
 	align-items: flex-start;
 	transform: translate3d(-100%, 0, 0);
