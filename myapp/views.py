@@ -148,8 +148,28 @@ def dashboard():
         action = "Clock In"
         url = url_for('views.clock_in')
 
+    # Prepare calendar_data
+    calendar_data = []
+    for attendance_record in user_attendance_records:
+        # Format the date to match FullCalendar's expected format (YYYY-MM-DD)
+        date = attendance_record.clock_in_time.strftime('%Y-%m-%d')
+
+        # Determine the color based on lateness or earliness
+        color = 'red' if attendance_record.status == 'Late' else 'green'
+
+        # Add the event to calendar_data
+        calendar_data.append({
+            'title': '',  # You can leave this empty if you don't need a title
+            'start': date,
+            'backgroundColor': color
+        })
+    import json
     return render_template(
         'dashboard_base.html',
+        calendar_data=json.dumps(calendar_data),
+        timezone= user_timezone,
+        current_date=current_time.strftime('%d-%m-%Y'),
+        current_time=current_time.strftime('%I:%M:%S %p %Z'),
         name=current_user.username,
         organization_count=organization_count,
         location_count=location_count,
