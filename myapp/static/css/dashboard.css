@@ -110,10 +110,14 @@ body {
 /* Main header */
 /* ================================================= */
 #main-header {
-	background-color: var(--main-header-bg);
-	padding: 1rem 1.5rem;
-	transition: background-color .4s ease-in-out;
+    background-color: var(--main-header-bg);
+    padding: 1rem 1.5rem;
+    transition: background-color .4s ease-in-out;
+    position: fixed;
+    z-index: 1000;
+    width: 100%; /* Set the width to 100% to match the viewport width */
 }
+
 
 #main-header nav,
 #main-header ul,
@@ -177,13 +181,13 @@ body.sidebar-open #toggle-icon-close {
 #sidebar {
 	background-color: var(--sidebar-bg);
 	padding: 1.5rem 0 1.5rem 1.5rem;
-	position: absolute;
+	position: fixed;
 	top: 0;
 	display: flex;
 	flex-direction: column;
 	gap: 4rem;
-	min-height: 100%;
-	z-index: 1000;
+	min-height:fit-content;
+	z-index: 900;
 	align-items: flex-start;
 	transform: translate3d(-100%, 0, 0);
 	transition: transform .4s ease-in-out, background-color .4s ease-in-out;
@@ -312,7 +316,7 @@ body.sidebar-open #sidebar {
 	border-radius: 8px;
 	height: calc(100vh + 10rem);
 	display: grid;
-	place-content: ;
+	
 	
 }
 
@@ -343,6 +347,7 @@ body.sidebar-open #sidebar {
 	#main-header a {
 		text-decoration: none;
 	}
+	
 
 	#main-header a span {
 		display: inline-block;
@@ -356,11 +361,14 @@ body.sidebar-open #sidebar {
 	}
 
 	#sidebar {
-		position: relative;
+		position: fixed;
 		transform: none;
+		height: 100%;
+		
 	}
 
 	#main {
+		padding-left: 220px;
 		display: grid;
 		grid-template-columns: auto 1fr;
 	}
