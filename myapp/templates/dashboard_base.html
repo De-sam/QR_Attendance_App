@@ -436,8 +436,8 @@
 									<h4 style="margin-left: 0.5rem;">Your Attendance Records In the Last 5 Days</h4>
 								</div>
 								<hr style="margin-top: 0%;margin-bottom: 0%;">
-								<div class="container mt-1">
-									<div class="card-body" style="max-height: 350px; overflow-y: scroll; padding-top: 0%;">
+								<div class="container mt-1" style="max-height: 350px; overflow-y: scroll; padding-top: 0%;">
+									
 										{% if user_attendance_records %}
 											<div>
 												{% for attendance in user_attendance_records %}
@@ -466,7 +466,7 @@
 										{% else %}
 											<p style="color: #fff;">No attendance records for the last 5 days.</p>
 										{% endif %}
-									</div>
+									
 								</div>
 							</div>
 						</div>
