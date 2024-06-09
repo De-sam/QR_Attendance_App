@@ -36,13 +36,25 @@
 
 	/* Adjusting size of the calendar controls */
 	.fc-toolbar {
-    font-size: 8px; /* Adjust font size of the controls */
+    font-size: 9px; /* Adjust font size of the controls */
 	}
 
 	/* Adjusting size of the calendar title */
 	.fc-toolbar-title {
-    font-size: 5px; /* Adjust font size of the title */
+    font-size: 7px; /* Adjust font size of the title */
 	}
+	#calendar {
+    height: 20%;
+	width: 100%; /* Adjust width as needed */
+    margin: 0 auto; /* Center the calendar horizontally */
+	}
+	/* Removing grid lines */
+	.fc-border-separate .fc-row,
+	.fc-border-separate .fc-content-skeleton,
+	.fc-border-separate .fc-bgevent-skeleton {
+    border: none; /* Remove borders */
+}
+	
 </style>
 
 	
@@ -422,17 +434,8 @@
 								</div>
 							</div>
 						</div>
-						<!-- Second  Card -->
-						<div class="col-md-6">
-							<div class="container">
-								<div class="row">
-									<div class="col">
-									<div id="calendar"></div>
-								</div>
-							</div>
-						</div>
-					</div>
-						<!-- Third Card -->
+
+						<!-- second Card -->
 						<div class="col-md-3">
 							<div class="card text-white bg-dark mb-3">
 								<div class="card-body">
@@ -449,6 +452,17 @@
 								</div>
 							</div>
 						</div>
+						
+						<!-- third	 Card -->
+						
+							<div class="container">
+								<div class="row">
+									<div class="col">
+									<div id="calendar"></div>
+								</div>
+							</div>
+						</div>
+					
 						
 						<!-- Forth  Card -->
 						<div class="col-md-12">

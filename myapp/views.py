@@ -161,7 +161,7 @@ def dashboard():
         if date not in calendar_data:
        # Add the event for this date
             status = "Late" if attendance_record.status == "Late" else "Early"
-            title = f"{status}"
+            title = f"{status} | {attendance_record.clock_in_time.strftime('%I:%M %p')}"
             calendar_data[date] = {
             'title': title,
             'start': date,
