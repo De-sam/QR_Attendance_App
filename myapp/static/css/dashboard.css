@@ -87,6 +87,28 @@ body {
 	border-radius: 20px;
 	border: white solid 3px;
 }
+.btn-val {
+	background-color: #da3e3f; /* Set the background color to #da3e3f */
+	color: white; /* Set text color to white */
+	border-color: #da3e3f; /* Set border color to #da3e3f */
+}
+
+.btn-val:hover {
+	background-color: #c63031; /* Darken the background color on hover */
+	border-color: #c63031; /* Darken the border color on hover */
+}
+
+.btn-outline-val {
+	color: #da3e3f; /* Set the text color to #da3e3f */
+	border-color: #da3e3f; /* Set the border color to #da3e3f */
+	background-color: transparent; /* Set the background color to transparent */
+}
+
+.btn-outline-val:hover {
+	color: white; /* Set text color to white on hover */
+	background-color: #da3e3f; /* Set background color to #da3e3f on hover */
+	border-color: #da3e3f; /* Set border color to #da3e3f on hover */
+}
 
 .row {
     display: flex;
