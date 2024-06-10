@@ -95,13 +95,10 @@ def dashboard():
     today = current_time.date()
     five_days_ago = today - timedelta(days=5)
 
-    # Get the locations the current user is a member of
-    user_locations = current_user.locations
-
-    # Query to get today's attendance records for user's locations
+    # Query to get today's attendance records for the current user
     today_attendance = Attendance.query.filter(
-        db.func.date(Attendance.clock_in_time) == today,
-        Attendance.location.has(Location.members.contains(current_user))
+        Attendance.user_id == current_user.id,
+        db.func.date(Attendance.clock_in_time) == today
     ).all()
 
     # Convert attendance times to user's timezone
@@ -116,9 +113,9 @@ def dashboard():
 
     # Query to get attendance records for the current user for the last five days
     user_attendance_records = Attendance.query.filter(
+        Attendance.user_id == current_user.id,
         db.func.date(db.func.timezone(user_timezone, Attendance.clock_in_time)) >= five_days_ago,
-        db.func.date(db.func.timezone(user_timezone, Attendance.clock_in_time)) <= today,
-        Attendance.location_id.in_(location.id for location in user_locations)
+        db.func.date(db.func.timezone(user_timezone, Attendance.clock_in_time)) <= today
     ).all()
 
     # Convert attendance times to user's timezone for past records
@@ -157,22 +154,22 @@ def dashboard():
         # Determine the color based on lateness or earliness
         color = 'red' if attendance_record.status == 'Late' else 'green'
 
-         # Check if an event for this date already exists
+        # Check if an event for this date already exists
         if date not in calendar_data:
-       # Add the event for this date
+            # Add the event for this date
             status = "Late" if attendance_record.status == "Late" else "Early"
             title = f"{status} | {attendance_record.clock_in_time.strftime('%I:%M %p')}"
             calendar_data[date] = {
-            'title': title,
-            'start': date,
-            'backgroundColor': color
-        }
+                'title': title,
+                'start': date,
+                'backgroundColor': color
+            }
 
     import json
     return render_template(
         'dashboard_base.html',
-         calendar_data=json.dumps(list(calendar_data.values())),
-        timezone= user_timezone,
+        calendar_data=json.dumps(list(calendar_data.values())),
+        timezone=user_timezone,
         current_date=current_time.strftime('%d-%m-%Y'),
         current_time=current_time.strftime('%I:%M:%S %p %Z'),
         name=current_user.username,
@@ -191,6 +188,7 @@ def dashboard():
         url=url,
         user_attendance_records=user_attendance_records
     )
+
 
 
 
