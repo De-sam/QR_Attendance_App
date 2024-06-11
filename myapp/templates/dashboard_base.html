@@ -365,7 +365,7 @@
 							<div class="row g-3"> 
 							<!-- Card status -->
 								<div class="col-md-12">
-								<div class="card text-white bg-dark mb-3" style=" border: 1px solid goldenrod;">
+								<div class="card  mb-3" style=" background:#f5f5f5;">
 									<div class="card-body text-center d-flex justify-content-around align-items-center">
 										<div>
 										{% if is_admin and is_member %}
@@ -410,9 +410,8 @@
 							</div>
 						{% if is_member %}
 						<!-- First Card -->
-						 	
 						<div class="col-md-6">
-							<div class="card text-white bg-dark mb-3" >
+							<div class="card  mb-3" style="background-color: #f5f5f5;">
 								<div class="card-body text-center">
 									<p>clock-in/clock-out</p>
 									<div style="display: flex; align-items: center; justify-content: center; margin-top: 10px;">
@@ -420,8 +419,7 @@
 											<p style="font-size: small; margin: 2px;">Current Status:</p>
 											<p style="font-size: small;">{% if action == 'Clock In' %}<span style="color: red;">Clocked out</span>{% else %}<span style="color: green;">Clocked in</span>{% endif %}</p>
 										</div>
-										<div style="height: 60px; border-left: 3px solid white; margin-right: 5px;"></div>
-										
+										<div style="height: 60px; border-left: 3px solid black; margin-right: 5px;"></div>
 											<!-- Dynamic button text and link based on user's clock-in status -->
 											<a class="btn {{ 'btn-danger' if action == 'Clock Out' else 'btn-success' }} " href="{{ url }}"> 
 												<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-alarm" viewBox="0 0 16 16">
@@ -437,7 +435,7 @@
 
 						<!-- second Card -->
 						<div class="col-md-6">
-							<div class="card text-white bg-dark mb-3">
+							<div class="card mb-3" style="background-color: #f5f5f5;">
 								<div class="card-body">
 									<p style="font-size: small; margin-bottom: 0px;" class="card-text">YOUR TIME ZONE: {{ timezone }}</p>
 									<p style="font-size: small; margin-bottom: 0px;" class="card-text">YOUR LOCAL TIME: {{ current_time }}</p>
@@ -456,7 +454,7 @@
 						<!-- Calendar Card -->
 						<div class="container mt-4">
 							<div class="card">
-								<div class="card-header bg-danger text-white">
+								<div class="card-header " style="background-color: #f5f5f5;">
 									<h5 class="card-title mb-0">
 										<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-calendar3 me-2" viewBox="0 0 16 16">
 											<path d="M14 4H2V14H14V4ZM2 1H4V0.5H5V1H11V0.5H12V1H14C14.55 1 15 1.45 15 2V15C15 15.55 14.55 16 14 16H2C1.45 16 1 15.55 1 15V2C1 1.45 1.45 1 2 1ZM3 6H5V8H3V6ZM6 6H8V8H6V6ZM9 6H11V8H9V6ZM3 9H5V11H3V9ZM6 9H8V11H6V9ZM9 9H11V11H9V9ZM12 6H14V8H12V6ZM12 9H14V11H12V9Z"/>
@@ -472,13 +470,13 @@
 						<!-- Forth  Card -->
 						<div class="container mt-4">
 							<div class="card">
-								<div class="card-header bg-danger text-white d-flex align-items-center">
+								<div class="card-header   d-flex align-items-center" style="background-color: #f5f5f5;">
 									<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-calendar3 me-2" viewBox="0 0 16 16">
 										<path d="M14 4H2V14H14V4ZM2 1H4V0.5H5V1H11V0.5H12V1H14C14.55 1 15 1.45 15 2V15C15 15.55 14.55 16 14 16H2C1.45 16 1 15.55 1 15V2C1 1.45 1.45 1 2 1ZM3 6H5V8H3V6ZM6 6H8V8H6V6ZM9 6H11V8H9V6ZM3 9H5V11H3V9ZM6 9H8V11H6V9ZM9 9H11V11H9V9ZM12 6H14V8H12V6ZM12 9H14V11H12V9Z"/>
 									</svg>
 									YOUR ATTENDANCE IN THE LAST 5 DAYS
 								</div>
-								<div class="card-body bg-dark text-white">
+								<div class="card-body  " style="background-color: inherit;">
 									<div class="container mt-1" style="max-height: 350px; overflow-y: scroll; padding-top: 0%;">
 										{% if user_attendance_records %}
 											<div>
@@ -512,7 +510,7 @@
 													<path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z"/>
 												</svg>
 											</div>
-											<p style="color: #fff; text-align: center;">No attendance records for the last 5 days.</p>
+											<p style=" text-align: center;">No attendance records for the last 5 days.</p>
 										{% endif %}
 									</div>
 								</div>
@@ -585,7 +583,7 @@
 							</div>
 						</div>
 					<div class="container-fluid mt-4">
-						<div class="btn btn-sm btn-danger">
+						<div class="btn btn-sm " style="background-color: #f5f5f5;">
 							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-building-add" viewBox="0 0 16 16">
 								<path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0"/>
 								<path d="M2 1a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6.5a.5.5 0 0 1-1 0V1H3v14h3v-2.5a.5.5 0 0 1 .5-.5H8v4H3a1 1 0 0 1-1-1z"/>
@@ -594,7 +592,7 @@
 							 JOIN REQUESTS
 						</div>
 						
-						<div class="card text-white mb-3" style="border: 2px solid red; margin-bottom: 20px;">
+						<div class="card text-white mb-3" style="border: 1px solid #f5f5f5; margin-bottom: 20px;">
 						  <div class="card-body overflow-auto" style="max-height: 300px;">
 							{% for join_request in join_requests %}
 							<div class="text-center mb-3 p-2" style="background-color: #f8f9fa; color: black; border: 1px solid goldenrod;">
