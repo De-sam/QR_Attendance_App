@@ -403,15 +403,13 @@
 										{% endif %}
 										
 										</div>
-										
-
 									</div>
 								</div>
 							</div>
 						{% if is_member %}
 						<!-- First Card -->
 						<div class="col-md-6">
-							<div class="card  mb-3" style="background-color: #f5f5f5;">
+							<div class="card  mb-1" style="background-color: #f5f5f5;">
 								<div class="card-body text-center">
 									<p>clock-in/clock-out</p>
 									<div style="display: flex; align-items: center; justify-content: center; margin-top: 10px;">
@@ -440,7 +438,7 @@
 									<p style="font-size: small; margin-bottom: 0px;" class="card-text">YOUR TIME ZONE: {{ timezone }}</p>
 									<p style="font-size: small; margin-bottom: 0px;" class="card-text">YOUR LOCAL TIME: {{ current_time }}</p>
 									<p style="font-size: small;" class="card-text">TODAY'S DATE: {{ current_date }}</p>
-									<a href="{{ url_for('views.set_timezone') }}" class="btn btn-sm btn-outline-danger">
+									<a href="{{ url_for('views.set_timezone') }}" class="btn btn-sm btn-danger">
 										<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
 										  <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0"/>
 										  <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z"/>
@@ -452,7 +450,7 @@
 						</div>
 						
 						<!-- Calendar Card -->
-						<div class="container mt-4">
+						<div class="container mt-2">
 							<div class="card">
 								<div class="card-header " style="background-color: #f5f5f5;">
 									<h5 class="card-title mb-0">
@@ -468,16 +466,16 @@
 							</div>
 						</div>
 						<!-- Forth  Card -->
-						<div class="container mt-4">
+						<div class="container mt-2">
 							<div class="card">
-								<div class="card-header   d-flex align-items-center" style="background-color: #f5f5f5;">
-									<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-calendar3 me-2" viewBox="0 0 16 16">
+								<div class="card-headerd-flex align-items-center" style="background-color: #f5f5f5;">
+									<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-calendar3 me-2" viewBox="0 0 16 16">
 										<path d="M14 4H2V14H14V4ZM2 1H4V0.5H5V1H11V0.5H12V1H14C14.55 1 15 1.45 15 2V15C15 15.55 14.55 16 14 16H2C1.45 16 1 15.55 1 15V2C1 1.45 1.45 1 2 1ZM3 6H5V8H3V6ZM6 6H8V8H6V6ZM9 6H11V8H9V6ZM3 9H5V11H3V9ZM6 9H8V11H6V9ZM9 9H11V11H9V9ZM12 6H14V8H12V6ZM12 9H14V11H12V9Z"/>
 									</svg>
 									YOUR ATTENDANCE IN THE LAST 5 DAYS
 								</div>
-								<div class="card-body  " style="background-color: inherit;">
-									<div class="container mt-1" style="max-height: 350px; overflow-y: scroll; padding-top: 0%;">
+								<div class="card-body" style="background-color: inherit; padding: 0%;">
+									<div class="container" style="max-height: 350px; overflow-y: scroll; padding-left: 0%;">
 										{% if user_attendance_records %}
 											<div>
 												{% for attendance in user_attendance_records %}
@@ -554,7 +552,7 @@
 						</div>
 						
 						<!-- Third Card -->
-						<div class="col-md-4">
+						<div class="col-md-2">
 							<div class="card text-white bg-dark mb-3">
 								<div class="card-body text-center d-flex justify-content-around align-items-center">
 									<div>
@@ -582,7 +580,7 @@
 								</div>
 							</div>
 						</div>
-					<div class="container-fluid mt-4">
+					<div class="container-fluid mt-2">
 						<div class="btn btn-sm " style="background-color: #f5f5f5;">
 							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-building-add" viewBox="0 0 16 16">
 								<path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0"/>
