@@ -74,7 +74,7 @@ class Location(db.Model):
     address = db.Column(db.String(200), nullable=False)
     qr_codes = db.relationship('QRCode', backref='location', lazy=True, cascade="all, delete-orphan")
     deadline = db.Column(db.Time, nullable=True, default=func.now())
-    
+    closing_time = db.Column(db.Time, nullable=True) 
 
     def __repr__(self):
         return f"Location('{self.name}', '{self.address}')"

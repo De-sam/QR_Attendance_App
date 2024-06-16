@@ -15,7 +15,7 @@
 
     .form-container {
         background-color:inherit;
-        padding: 2rem;
+        padding:2rem;
         border: solid 1px grey;
         border-radius: 10px;
         box-shadow: 0 4px 8px grey;
@@ -58,20 +58,20 @@
     }
     .btn-toggle {
         color: inherit;
-        border:solid 0.2px;
-        padding: 10px 10px;
+        border: none; /* Remove the border */
+        border-bottom: 3px solid transparent; /* Add a transparent bottom border */
+        padding: 10px;
         margin-bottom: 20px;
         cursor: pointer;
         width: 100px;
         background-color: inherit;
-
     }
+    
     .btn-toggle.active {
-        background-color: #da3e3f;
-        border: solid 0.2px;
-        color: white;
-
+        border-bottom-color: #da3e3f; /* Change the color of the bottom border for the active button */
+        color: #da3e3f; /* Change the text color for the active button */
     }
+    
     .form-control, .btn-danger, .form-check-input {
         color: white;
         border-radius: 10px;

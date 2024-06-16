@@ -47,7 +47,7 @@ def home():
 @views.route('/dashboard/')
 @login_required
 def dashboard():
-    user_id = current_user.id 
+    user_id = current_user.id
     search_query = request.args.get('search', '').strip()
     user = current_user
 
@@ -71,7 +71,7 @@ def dashboard():
                 for member in location.members:
                     if search_query == '' or search_query.lower() in member.username.lower():
                         member_details.append({
-                            'id': member.id, 
+                            'id': member.id,
                             'name': member.username,
                             'email': member.email,
                             'alias': location.alias,
@@ -111,23 +111,32 @@ def dashboard():
     total_present = sum(1 for record in today_attendance if record.is_clocked_in or record.clock_out_time is not None)
     total_absent = total_members - total_present
 
-    # Query to get attendance records for the current user for the last five days
-    user_attendance_records = Attendance.query.filter(
+    # Query to get attendance records for the current user for the last five days, sorted by clock_in_time descending
+    last_five_days_attendance = Attendance.query.filter(
         Attendance.user_id == current_user.id,
         db.func.date(db.func.timezone(user_timezone, Attendance.clock_in_time)) >= five_days_ago,
         db.func.date(db.func.timezone(user_timezone, Attendance.clock_in_time)) <= today
-    ).all()
+    ).order_by(Attendance.clock_in_time.desc()).all()
 
     # Convert attendance times to user's timezone for past records
-    for record in user_attendance_records:
+    for record in last_five_days_attendance:
         record.clock_in_time = record.clock_in_time.astimezone(user_tz)
         if record.clock_out_time:
             record.clock_out_time = record.clock_out_time.astimezone(user_tz)
 
-    # Debugging: Print attendance records to verify query results
-    print(f"Attendance records for the last 5 days for user {user_id}:")
-    for attendance in user_attendance_records:
-        print(f"Date: {attendance.clock_in_time}, Status: {attendance.status}")
+    # Query to get attendance records for the current user for the current month
+    first_day_of_month = today.replace(day=1)
+    month_attendance_records = Attendance.query.filter(
+        Attendance.user_id == current_user.id,
+        db.func.date(db.func.timezone(user_timezone, Attendance.clock_in_time)) >= first_day_of_month,
+        db.func.date(db.func.timezone(user_timezone, Attendance.clock_in_time)) <= today
+    ).order_by(Attendance.clock_in_time.desc()).all()
+
+    # Convert attendance times to user's timezone for month records
+    for record in month_attendance_records:
+        record.clock_in_time = record.clock_in_time.astimezone(user_tz)
+        if record.clock_out_time:
+            record.clock_out_time = record.clock_out_time.astimezone(user_tz)
 
     today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
     today_end = today_start + timedelta(days=1)
@@ -140,14 +149,14 @@ def dashboard():
 
     if attendance and not attendance.clock_out_time:
         action = "Clock Out"
-        url = url_for('views.clock_in')
     else:
         action = "Clock In"
-        url = url_for('views.clock_in')
 
-    # Prepare calendar_data
+    url = url_for('views.clock_in')
+
+    # Prepare calendar_data for the current month
     calendar_data = {}
-    for attendance_record in user_attendance_records:
+    for attendance_record in month_attendance_records:
         # Format the date to match FullCalendar's expected format (YYYY-MM-DD)
         date = attendance_record.clock_in_time.strftime('%Y-%m-%d')
 
@@ -186,9 +195,8 @@ def dashboard():
         is_member=user_locations,
         action=action,
         url=url,
-        user_attendance_records=user_attendance_records
+        user_attendance_records=last_five_days_attendance  # Only the last 5 days for another purpose
     )
-
 
 
 
@@ -611,6 +619,27 @@ def set_deadline(location_id):
                             is_member=user_locations
                             )
 
+@views.route('/set_closing_time/<int:location_id>', methods=['GET', 'POST'])
+@login_required
+def set_closing_time(location_id):
+    location = Location.query.get_or_404(location_id)
+    if request.method == 'POST':
+        closing_time = request.form.get('closing_time')
+        location.closing_time = datetime.strptime(closing_time, '%H:%M').time()
+        db.session.commit()
+        flash('Closing time updated successfully!', 'success')
+        return redirect(url_for('views.set_closing_time', location_id=location.id))
+    user_id = current_user.id  # Static for demonstration; use authenticated user's ID in production
+    is_admin = Organization.query.with_entities(func.count(Organization.id)).filter_by(user_id=user_id).scalar() > 0
+    user_locations = current_user.locations
+    return render_template('set_closing_time.html',
+                            location=location,
+                            name=current_user.username,
+                            is_admin=is_admin,
+                            is_member=user_locations
+                            )
+
+
 @views.route('/regenerate_qr/<int:location_id>', methods=['POST','GET'])
 @login_required
 def regenerate_qr(location_id):
@@ -717,14 +746,14 @@ def pre():
 @login_required
 def process_qr_code():
     qr_code_data = request.form.get('qrCodeData')
-    
+
     # Check if latitude and longitude data are provided
     lat_data = request.form.get('latitude')
     lng_data = request.form.get('longitude')
     if not lat_data or not lng_data:
         flash('Please set coordinates.', 'danger')
-        return redirect(url_for('views.dashboard'))
-    
+        return redirect(url_for('views.clock_in'))
+
     try:
         # Convert latitude and longitude to float
         lat = float(lat_data)
@@ -732,117 +761,88 @@ def process_qr_code():
         print(f"Received coordinates: Latitude: {lat}, Longitude: {lng}")
     except ValueError:
         flash('Invalid coordinates.', 'danger')
-        return redirect(url_for('views.dashboard'))
-    
+        return redirect(url_for('views.clock_in'))
+
     current_coords = (lat, lng)
-    
+
     # Parse and validate QR code data
     qr_code = QRCode.query.filter_by(qr_data=qr_code_data).first()
     if not qr_code:
         flash('QR Code not recognized.', 'danger')
-        return redirect(url_for('views.dashboard'))
-    
+        return redirect(url_for('views.clock_in'))
+
     location = Location.query.get(qr_code.location_id)
     if not location:
         flash('No location associated with this QR code.', 'danger')
-        return redirect(url_for('views.dashboard'))
-    
+        return redirect(url_for('views.clock_in'))
+
     print(f"Location coordinates: Latitude: {location.latitude}, Longitude: {location.longitude}")
-    
+
     # Check if the current user is associated with the location
     if current_user not in location.members:
         flash('You are not authorized to perform this action at this location.', 'danger')
-        return redirect(url_for('views.dashboard'))
-    
-    # Get the user's timezone
-    if current_user.timezone:
-        tz = pytz.timezone(current_user.timezone)
-    else:
-        tz = pytz.utc
+        return redirect(url_for('views.clock_in'))
 
+    # Get the user's timezone
+    tz = pytz.timezone(current_user.timezone) if current_user.timezone else pytz.utc
     current_time = datetime.now(tz)
     print(f"Current time in user's timezone: {current_time}")
-    # import math
 
-    #  # Helper functions
-    # def deg_to_rad(deg):
-    #     return deg * (math.pi / 180)
+    # Check if the user is within 100 meters of the coordinates in the QR code
+    import math
+    def haversine(lat1, lon1, lat2, lon2):
+        R = 6371000  # Radius of the Earth in meters
+        phi1 = math.radians(lat1)
+        phi2 = math.radians(lat2)
+        delta_phi = math.radians(lat2 - lat1)
+        delta_lambda = math.radians(lon2 - lon1)
+        a = math.sin(delta_phi / 2) ** 2 + math.cos(phi1) * math.cos(phi2) * math.sin(delta_lambda / 2) ** 2
+        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+        return R * c
 
-    # def haversine(lat1, lon1, lat2, lon2):
-    #     R = 6371000  # Radius of the Earth in meters
-    #     lat1_rad = deg_to_rad(lat1)
-    #     lon1_rad = deg_to_rad(lon1)
-    #     lat2_rad = deg_to_rad(lat2)
-    #     lon2_rad = deg_to_rad(lon2)
-    #     d_lat = lat2_rad - lat1_rad
-    #     d_lon = lon2_rad - lon1_rad
-    #     a = math.sin(d_lat / 2) ** 2 + math.cos(lat1_rad) * math.cos(lat2_rad) * math.sin(d_lon / 2) ** 2
-    #     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-    #     distance = R * c
-    #     return distance
-
-    # # Helper function to check if within radius using bounding box and Haversine
-    # def is_within_radius(lat1, lon1, lat2, lon2, radius=500):
-    #     delta = 0.0020  # Delta value for bounding box approximation
-
-    #     # Create a bounding box around the initial coordinates
-    #     lat_min = lat1 - delta
-    #     lat_max = lat1 + delta
-    #     lon_min = lon1 - delta
-    #     lon_max = lon1 + delta
-        
-    #     # Check if the coordinates are within the bounding box
-    #     if lat_min <= lat2 <= lat_max and lon_min <= lon2 <= lon_max:
-    #         # If within bounding box, calculate precise distance using haversine library
-    #         distance = haversine((lat1, lon1), (lat2, lon2), unit=Unit.METERS)
-    #         return distance <= radius, distance
-    #     else:
-    #         # Outside the bounding box, definitely out of range
-    #         return False, None
-
-    # location_coords = (location.latitude, location.longitude)
-    # within_radius, distance = is_within_radius(lat, lng, location.latitude, location.longitude, 500)
-    # if not within_radius:
-    #     if distance is not None:
-    #         flash(f'Not within the required range of the location. Distance: {distance:.2f} meters', 'danger')
-    #     else:
-    #         flash('Not within the required range of the location.', 'danger')
-    #     return redirect(url_for('views.dashboard'))
-    # else:
-    #     print(f"Calculated distance: {distance:.2f} meters")
-    #     flash(f'Within the required range of the location. Distance: {distance:.2f} meters', 'info')
-    
-    if current_user.timezone:
-        tz = pytz.timezone(current_user.timezone)
-        c_time = datetime.now(tz)
+    distance = haversine(lat, lng, location.latitude, location.longitude)
+    if distance > 100:
+        flash(f'You are not within the required range of the location. Distance: {distance:.2f} meters', 'danger')
+        return redirect(url_for('views.clock_in'))
     else:
-        c_time = datetime.now(pytz.utc)
-
+        flash(f'Within the required range of the location. Distance: {distance:.2f} meters', 'success')
 
     # Check deadline and set status
+    c_time = current_time
     if location.deadline:
         deadline_time = location.deadline
         deadline_datetime = datetime.combine(c_time.date(), deadline_time, tzinfo=c_time.tzinfo)
     else:
         deadline_datetime = None
 
-    # Check deadline and set status
     if deadline_datetime is None:
-        status = 'Dead line not set'
+        status = 'Deadline not set'
     elif c_time <= deadline_datetime:
         status = 'Early'
     else:
         status = 'Late'
-    
-    
-    
 
-    # Find if there's an open attendance record
+    # Auto clock-out logic (manual clock-out remains)
+    auto_clock_out_time = None
+    if location.closing_time:
+        closing_time = datetime.combine(c_time.date(), location.closing_time, tzinfo=c_time.tzinfo)
+        auto_clock_out_time = closing_time + timedelta(minutes=30)
+
+    if auto_clock_out_time and current_time > auto_clock_out_time:
+        # Check for open attendance records and auto clock out
+        open_attendances = Attendance.query.filter_by(user_id=current_user.id, location_id=location.id, is_clocked_in=True).all()
+        for open_attendance in open_attendances:
+            open_attendance.clock_out_time = auto_clock_out_time
+            open_attendance.is_clocked_in = False
+            flash(f'You were automatically clocked out at {auto_clock_out_time.strftime("%I:%M:%S %p %Z")}.', 'info')
+        db.session.commit()
+
+    # Process clock-in or clock-out
     attendance = Attendance.query.filter_by(user_id=current_user.id, location_id=location.id, is_clocked_in=True).first()
     if attendance:
         attendance.clock_out_time = current_time
         attendance.is_clocked_in = False
-        flash(f'Successfully clock-out at {current_time.strftime("%I:%M:%S %p %Z")}.Goodbye!!!', 'success')
+        flash(f'Successfully clocked out at {current_time.strftime("%I:%M:%S %p %Z")}. Goodbye!!!', 'success')
     else:
         new_attendance = Attendance(
             user_id=current_user.id,
@@ -852,9 +852,9 @@ def process_qr_code():
             status=status
         )
         db.session.add(new_attendance)
-        flash(f'Clock-in successful. You arrived at {current_time.strftime("%I:%M:%S %p %Z")} ({status}).', 'success')
+        flash(f'Clock-in successful. Welcome, you arrived at {current_time.strftime("%I:%M:%S %p %Z")} ({status}).', 'success')
     db.session.commit()
-    
+
     return redirect(url_for('views.dashboard'))
 
 @views.route('/attendance_log', methods=['GET', 'POST'])
@@ -868,17 +868,14 @@ def attendance_log():
     end_date = request.args.get('end_date')
     download = request.args.get('download')
 
-    if selected_org_id and selected_location_id:
-        query = Attendance.query.join(Location).filter(
-            Attendance.location_id == selected_location_id,
-            Location.organization_id == selected_org_id
-        )
-    elif selected_org_id:
-        query = Attendance.query.join(Location).filter(
-            Location.organization_id == selected_org_id
-        )
-    else:
-        query = Attendance.query
+    # Build the query based on filters
+    query = Attendance.query.join(Location)
+
+    if selected_org_id:
+        query = query.filter(Location.organization_id == selected_org_id)
+
+    if selected_location_id:
+        query = query.filter(Attendance.location_id == selected_location_id)
 
     if selected_status:
         query = query.filter(Attendance.status == selected_status)
@@ -891,25 +888,19 @@ def attendance_log():
         end_date_obj = datetime.strptime(end_date, '%Y-%m-%d')
         query = query.filter(Attendance.clock_in_time <= end_date_obj)
 
+    # Sort by clock_in_time descending
+    query = query.order_by(Attendance.clock_in_time.desc())
+    
     attendances = query.all()
 
-    
-     # Get user's current timezone
-    user_timezone = current_user.timezone    
-
-   
-    
-    if current_user.timezone:
-        tz = pytz.timezone(current_user.timezone)
-        current_time = datetime.now(tz)
-    else:
-        current_time = datetime.now(pytz.utc)
-
+    # Get user's current timezone
     user_timezone = current_user.timezone
     if user_timezone:
         user_tz = pytz.timezone(user_timezone)
     else:
         user_tz = pytz.utc
+
+    current_time = datetime.now(user_tz)
 
     if not selected_org_id and not selected_location_id:
         # No organization selected, so no attendance records to display
@@ -922,12 +913,11 @@ def attendance_log():
                                selected_location_id=selected_location_id,
                                attendances=attendances,
                                name=current_user.username,
-                               timezone= user_timezone,
+                               timezone=user_timezone,
                                current_date=current_time.strftime('%d-%m-%Y'),
                                current_time=current_time.strftime('%I:%M:%S %p %Z'),
                                is_admin=is_admin,
-                                is_member=user_locations
-                               )
+                               is_member=user_locations)
 
     # Convert attendance times to user's local timezone
     if attendances:
@@ -935,8 +925,7 @@ def attendance_log():
             attendance.clock_in_time = attendance.clock_in_time.astimezone(user_tz)
             if attendance.clock_out_time:
                 attendance.clock_out_time = attendance.clock_out_time.astimezone(user_tz)
-    
-    import pdfkit
+
     if download == 'pdf':
         html = render_template('attendance_pdf.html', attendances=attendances, user_timezone=current_user.timezone)
         pdf = pdfkit.from_string(html, False)
@@ -944,20 +933,10 @@ def attendance_log():
         response.seek(0)
         return send_file(response, mimetype='application/pdf', as_attachment=True, download_name='attendance.pdf')
 
-
-    selected_status = request.args.get('status')
-    selected_date = request.args.get('date')
-
-    if selected_status:
-            query = query.filter(Attendance.status == selected_status)
-
-    if selected_date:
-            date_obj = datetime.strptime(selected_date, '%Y-%m-%d')
-            query = query.filter(db.func.date(Attendance.clock_in_time) == date_obj)
-
     user_id = current_user.id  # Static for demonstration; use authenticated user's ID in production
     is_admin = Organization.query.with_entities(func.count(Organization.id)).filter_by(user_id=user_id).scalar() > 0
     user_locations = current_user.locations
+
     return render_template(
         'attendance_log.html',
         attendances=attendances,
@@ -968,8 +947,7 @@ def attendance_log():
         current_date=current_time.strftime('%d-%m-%Y'),
         current_time=current_time.strftime('%I:%M:%S %p %Z'),
         selected_status=selected_status,
-        selected_date=selected_date,
-        timezone= user_timezone,
+        timezone=user_timezone,
         is_admin=is_admin,
         is_member=user_locations
     )

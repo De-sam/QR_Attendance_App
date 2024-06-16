@@ -121,25 +121,38 @@ body {
     margin-bottom: 20px; /* Adjust vertical space between cards */
   }
 
-  /* Media query for responsiveness */
-  @media only screen and (max-width: 768px) {
-    .col-md-6 {
-      flex: 0 0 calc(100% - 20px);
+  .my-card {
+    background: #f5f5f5;
+    opacity: 0;
+    transform: translateY(-50px);
+    animation: slideDown 2s ease-out forwards; /* Adjust the duration to 2s for a slower effect */
+}
+
+@keyframes slideDown {
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
-  }
+}
+
+/* Media query for responsiveness */
+@media only screen and (max-width: 768px) {
+    .col-md-6 {
+        flex: 0 0 calc(100% - 20px);
+    }
+}
+
 
 /* ================================================= */
 /* Main header */
 /* ================================================= */
 #main-header {
-    background-color: var(--main-header-bg);
-    padding: 1rem 1.5rem;
-    transition: background-color .4s ease-in-out;
-    position: fixed;
-    z-index: 1000;
-    width: 100%; /* Set the width to 100% to match the viewport width */
-}
+	background-color: var(--main-header-bg);
+	padding: 1rem 1.5rem;
+	transition: background-color .4s ease-in-out;
 
+	
+}
 
 #main-header nav,
 #main-header ul,
@@ -203,16 +216,16 @@ body.sidebar-open #toggle-icon-close {
 #sidebar {
 	background-color: var(--sidebar-bg);
 	padding: 1.5rem 0 1.5rem 1.5rem;
-	position: fixed;
+	position: absolute;
 	top: 0;
 	display: flex;
 	flex-direction: column;
 	gap: 4rem;
-	min-height:100%;
-	z-index: 900;
+	min-height: 100%;
 	align-items: flex-start;
 	transform: translate3d(-100%, 0, 0);
 	transition: transform .4s ease-in-out, background-color .4s ease-in-out;
+	z-index: 50;
 }
 
 #sidebar svg {
@@ -324,13 +337,11 @@ body.sidebar-open #sidebar {
 	transform: translate3d(0, 0, 0);
 }
 
-
-
 /* ================================================= */
 /* Main content */
 /* ================================================= */
 #main-content {
-	padding: 1.5rem;
+	padding: 0%;
 }
 
 #main-content__container {
@@ -338,8 +349,8 @@ body.sidebar-open #sidebar {
 	border-radius: 8px;
 	height: calc(100vh + 10rem);
 	display: grid;
-	
-	
+	place-content: center;
+
 }
 
 
@@ -369,7 +380,6 @@ body.sidebar-open #sidebar {
 	#main-header a {
 		text-decoration: none;
 	}
-	
 
 	#main-header a span {
 		display: inline-block;
@@ -383,14 +393,11 @@ body.sidebar-open #sidebar {
 	}
 
 	#sidebar {
-		position: fixed;
+		position: relative;
 		transform: none;
-		height: 100%;
-		
 	}
 
 	#main {
-		padding-left: 220px;
 		display: grid;
 		grid-template-columns: auto 1fr;
 	}
