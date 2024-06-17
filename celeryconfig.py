@@ -3,7 +3,7 @@ from celery.schedules import crontab
 CELERY_BEAT_SCHEDULE = {
     'auto-clock-out-every-5-minutes': {
         'task': 'myapp.tasks.auto_clock_out',
-        'schedule': crontab(minute='*/2'),  # Every 30 minutes
+        'schedule': crontab(minute='*/5'),  # Every 30 minutes
     },
 }
 
