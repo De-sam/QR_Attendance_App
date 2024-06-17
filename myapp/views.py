@@ -833,7 +833,7 @@ def process_qr_code():
     ).all()
 
     if existing_attendance and not any(a.is_clocked_in for a in existing_attendance):
-        flash('You have already clocked in and out today. Cannot clock in again.', 'danger')
+        flash('You have already clocked in and out today. you are not allowed to clock in again today!!!.', 'danger')
         return redirect(url_for('views.clock_in'))
 
     # Process clock-in or clock-out

@@ -1,10 +1,17 @@
 from celery.schedules import crontab
 
-CELERYBEAT_SCHEDULE = {
+CELERY_BEAT_SCHEDULE = {
     'auto-clock-out-every-30-minutes': {
-        'task': 'your_flask_app.tasks.auto_clock_out',
+        'task': 'myapp.tasks.auto_clock_out',
         'schedule': crontab(minute='*/30'),  # Every 30 minutes
     },
 }
 
-CELERY_TIMEZONE = 'UTC'
+broker_url = 'redis://localhost:6379/0'
+result_backend = 'redis://localhost:6379/0'
+task_serializer = 'json'
+result_serializer = 'json'
+accept_content = ['json']
+timezone = 'UTC'
+enable_utc = True
+broker_connection_retry_on_startup = True
