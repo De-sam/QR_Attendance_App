@@ -3,11 +3,13 @@ from myapp import create_app
 from myapp.models import db, Attendance, Location
 from datetime import datetime, timedelta
 import pytz
+import logging
 
 app = create_app()
 
 @celery.task(name='myapp.tasks.auto_clock_out')
 def auto_clock_out():
+    logging.info('Auto clock out task is running')
     with app.app_context():
         locations = Location.query.filter(Location.closing_time.isnot(None)).all()
         for location in locations:
