@@ -805,7 +805,7 @@ def process_qr_code():
         flash(f'You are not within the required range of the location. Distance: {distance:.2f} meters', 'danger')
         return redirect(url_for('views.clock_in'))
     else:
-        flash(f'Within the required range of the location. Distance: {distance:.2f} meters', 'success')
+        flash(f'Within the required range of the location. Distance: {distance:.2f} meters', 'info')
 
     # Check deadline and set status
     c_time = current_time
@@ -822,20 +822,19 @@ def process_qr_code():
     else:
         status = 'Late'
 
-    # Auto clock-out logic (manual clock-out remains)
-    auto_clock_out_time = None
-    if location.closing_time:
-        closing_time = datetime.combine(c_time.date(), location.closing_time, tzinfo=c_time.tzinfo)
-        auto_clock_out_time = closing_time + timedelta(minutes=30)
+    # Check if the user has already clocked in and out on the same day
+    start_of_day = datetime.combine(current_time.date(), datetime.min.time(), tzinfo=current_time.tzinfo)
+    end_of_day = datetime.combine(current_time.date(), datetime.max.time(), tzinfo=current_time.tzinfo)
+    existing_attendance = Attendance.query.filter(
+        Attendance.user_id == current_user.id,
+        Attendance.location_id == location.id,
+        Attendance.clock_in_time >= start_of_day,
+        Attendance.clock_in_time <= end_of_day
+    ).all()
 
-    if auto_clock_out_time and current_time > auto_clock_out_time:
-        # Check for open attendance records and auto clock out
-        open_attendances = Attendance.query.filter_by(user_id=current_user.id, location_id=location.id, is_clocked_in=True).all()
-        for open_attendance in open_attendances:
-            open_attendance.clock_out_time = auto_clock_out_time
-            open_attendance.is_clocked_in = False
-            flash(f'You were automatically clocked out at {auto_clock_out_time.strftime("%I:%M:%S %p %Z")}.', 'info')
-        db.session.commit()
+    if existing_attendance and not any(a.is_clocked_in for a in existing_attendance):
+        flash('You have already clocked in and out today. Cannot clock in again.', 'danger')
+        return redirect(url_for('views.clock_in'))
 
     # Process clock-in or clock-out
     attendance = Attendance.query.filter_by(user_id=current_user.id, location_id=location.id, is_clocked_in=True).first()
