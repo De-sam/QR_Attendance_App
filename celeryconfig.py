@@ -16,9 +16,9 @@ app.conf.update(
 )
 
 app.conf.beat_schedule = {
-    'auto-clock-out-every-2-minutes': {
+    'auto-clock-out-every-1-minutes': {
         'task': 'myapp.tasks.auto_clock_out',
-        'schedule': crontab(minute='*/2'),  # Every 2 minutes
+        'schedule': crontab(minute='*/1'),  # Every 2 minutes
     },
 }
 

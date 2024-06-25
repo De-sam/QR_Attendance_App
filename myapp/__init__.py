@@ -46,9 +46,18 @@ def create_app():
 
     from .views import views
     from .auth import auth
+    from .dashboard import dash
+    from .organisation import org
+    from .location import loc
+    from .attendance import attend
 
     app.register_blueprint(views, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/')
+    app.register_blueprint(dash, url_prefix='/')
+    app.register_blueprint(org, url_prefix='/')
+    app.register_blueprint(loc, url_prefix='/')
+    app.register_blueprint(attend, url_prefix='/')
+
 
     from .models import User, Organization, Location, QRCode, JoinRequest
 

@@ -41,7 +41,7 @@ def login():
         if user and check_password_hash(user.password, password):
             login_user(user, remember=True)
             session['last_activity'] = datetime.now()
-            return redirect(url_for('views.dashboard'))
+            return redirect(url_for('dash.dashboard'))
         else:
             flash('Login details are incorrect. Please try again.', category='danger')
 
@@ -155,7 +155,7 @@ def callback_google():
             # Log the user in
             login_user(user, remember=True)
 
-            return redirect(url_for('views.dashboard'))
+            return redirect(url_for('dash.dashboard'))
 
     flash('Failed to log in with Google.', 'danger')
     return redirect(url_for('auth.login'))

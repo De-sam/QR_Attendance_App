@@ -160,10 +160,8 @@
 
 			<ul>
 				<li id="main-header__logo">
-					<a href="index.html">
-						<svg>
-							<use xlink:href="#logo"></use>
-						</svg>
+					<a href="/dashboard" style="color: #f5f5f5;"">
+						TSHR
 					</a>
 				</li>
 				<li>
@@ -294,7 +292,7 @@
 						</li>
 
 					<li>
-						<a href="{{ url_for('views.set_timezone') }}">
+						<a href="{{ url_for('attend.set_timezone') }}">
 							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
 								<path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0"/>
 								<path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z"/>
@@ -515,7 +513,7 @@
 									<p style="font-size: small; margin-bottom: 0px;" class="card-text">YOUR TIME ZONE: {{ timezone }}</p>
 									<p style="font-size: small; margin-bottom: 0px;" class="card-text">YOUR LOCAL TIME: {{ current_time }}</p>
 									<p style="font-size: small;" class="card-text">TODAY'S DATE: {{ current_date }}</p>
-									<a href="{{ url_for('views.set_timezone') }}" class="btn btn-sm btn-danger">
+									<a href="{{ url_for('attend.set_timezone') }}" class="btn btn-sm btn-danger">
 										<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
 										  <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0"/>
 										  <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z"/>
@@ -613,7 +611,7 @@
 							  </p>
 					  
 							  <!-- Form to approve join request -->
-							  <form method="POST" action="{{ url_for('views.approve_join_request', join_request_id=join_request.id) }}" style="display: inline-block;">
+							  <form method="POST" action="{{ url_for('org.approve_join_request', join_request_id=join_request.id) }}" style="display: inline-block;">
 								<button type="submit" class="btn btn-sm btn-success">
 								  Approve
 								  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check2" viewBox="0 0 16 16">
@@ -623,7 +621,7 @@
 							  </form>
 					  
 							  <!-- Form to decline join request -->
-							  <form method="POST" action="{{ url_for('views.decline_join_request', join_request_id=join_request.id) }}" style="display: inline-block;">
+							  <form method="POST" action="{{ url_for('org.decline_join_request', join_request_id=join_request.id) }}" style="display: inline-block;">
 								<button type="submit" class="btn btn-sm btn-danger">
 								  Decline
 								  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
@@ -646,7 +644,7 @@
 						</div>
 					  </div>					  
         <h3>Members of your organisation</h3>
-		<form action="{{ url_for('views.dashboard') }}" method="GET" class="d-flex justify-content-between align-items-center my-2">
+		<form action="{{ url_for('dash.dashboard') }}" method="GET" class="d-flex justify-content-between align-items-center my-2">
 			<input class="form-control me-2 flex-grow-1" type="search" name="search" placeholder="Search by name" value="{{ request.args.get('search', '') }}" aria-label="Search">
 			<button class="btn btn-outline-danger" type="submit">
 				<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
@@ -675,7 +673,7 @@
                 <td>{{ member.email }}</td>
                 <td>{{ member.organization_name }} ({{ member.alias }})</td>
                 <td>
-                    <form action="{{ url_for('views.remove_member', user_id=member.id, location_id=member.location_id) }}" method="POST">
+                    <form action="{{ url_for('loc.remove_member', user_id=member.id, location_id=member.location_id) }}" method="POST">
                         <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?');">Remove</button>
                     </form>
                 </td>
