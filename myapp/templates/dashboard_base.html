@@ -583,6 +583,17 @@
 										MONTHLY SUMMARY
 									</h5>
 								</div>
+								<div style="display: flex; align-items: center; gap: 10px;">
+									<div style="display: flex; align-items: center; gap: 5px;">
+										<span style="display: inline-block; width: 20px; height: 20px; background-color: red; margin-left: 20px;"></span>
+										<span>Late: {{ late_count }}</span>
+									</div>
+									<div style="display: flex; align-items: center; gap: 5px;">
+										<span style="display: inline-block; width: 20px; height: 20px; background-color: green;"></span>
+										<span>Early: {{ early_count }}</span>
+									</div>
+									
+								</div>
 								<div class="card-body">
 									<div id="calendar"></div>
 								</div>
