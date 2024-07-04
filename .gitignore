@@ -3,3 +3,6 @@
 virenv
 QRcode
 .env
+virtenv
+/virtenv
+.virtenv
