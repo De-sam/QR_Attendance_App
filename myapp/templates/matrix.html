@@ -1,21 +1,60 @@
 {% extends "dashboard_base.html" %}
 {% block title %} Attendance Matrix {% endblock %}
 {% block content %}
-<div class="container mt-5"></div>
+<div class="container mt-5">
     <h2>Attendance Matrix for {{ organization.name }}</h2>
 
-    <!-- Filter by Location -->
+    <!-- Filter Form -->
     <form method="get" class="mb-4">
-        <label for="location_id">Filter by Location:</label>
-        <select name="location_id" id="location_id" class="form-select">
-            <option value="">All Locations</option>
-            {% for location in locations %}
-                <option value="{{ location.id }}" {% if location.id == selected_location_id %}selected{% endif %}>
-                    {{ location.name }}
-                </option>
-            {% endfor %}
-        </select>
-        <button type="submit" class="btn btn-primary mt-2">Filter</button>
+        <div class="row">
+            <!-- Organization Filter -->
+            <div class="col-md-3">
+                <label for="organization_id">Organization:</label>
+                <select name="organization_id" id="organization_id" class="form-select">
+                    <option value="">All Organizations</option>
+                    {% for org in organizations %}
+                        <option value="{{ org.id }}" {% if org.id == selected_org_id %}selected{% endif %}>{{ org.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Location Filter (Alias instead of Name) -->
+            <div class="col-md-3">
+                <label for="location_id">Location (Alias):</label>
+                <select name="location_id" id="location_id" class="form-select">
+                    <option value="">All Locations</option>
+                    {% for location in locations %}
+                        <option value="{{ location.id }}" {% if location.id == selected_location_id %}selected{% endif %}>{{ location.alias }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Status Filter -->
+            <div class="col-md-2">
+                <label for="status">Status:</label>
+                <select name="status" id="status" class="form-select">
+                    <option value="">All</option>
+                    <option value="Early" {% if selected_status == 'Early' %}selected{% endif %}>Early</option>
+                    <option value="Late" {% if selected_status == 'Late' %}selected{% endif %}>Late</option>
+                </select>
+            </div>
+
+            <!-- Date Range Filter -->
+            <div class="col-md-2">
+                <label for="start_date">Start Date:</label>
+                <input type="date" name="start_date" id="start_date" class="form-control" value="{{ start_date }}">
+            </div>
+
+            <div class="col-md-2">
+                <label for="end_date">End Date:</label>
+                <input type="date" name="end_date" id="end_date" class="form-control" value="{{ end_date }}">
+            </div>
+
+            <!-- Filter Button -->
+            <div class="col-md-12 mt-3">
+                <button type="submit" class="btn btn-primary">Filter</button>
+            </div>
+        </div>
     </form>
 
     <!-- Attendance Matrix Table -->

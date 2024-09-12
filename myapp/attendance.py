@@ -176,7 +176,7 @@ def process_qr_code():
 
     return redirect(url_for('dash.dashboard'))
 
-@attend.route('/attendance_matrix', methods=['GET'])
+@attend.route('/attendance_matrix', methods=['GET', 'POST'])
 @login_required
 def attendance_matrix():
     # Get the user's organization to check if they are an admin
@@ -190,30 +190,50 @@ def attendance_matrix():
         flash('Unauthorized access. Only admins can view this page.', 'danger')
         return redirect(url_for('dash.dashboard'))
 
-    # Get the selected location if provided
+    # Filters from request
+    selected_org_id = request.args.get('organization_id')
     selected_location_id = request.args.get('location_id')
+    selected_status = request.args.get('status')
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
 
     # Query for members of the organization
     members_query = User.query.join(Organization).filter(Organization.id == organization.id)
 
-    # Filter by location if selected
+    # Filter by organization
+    if selected_org_id:
+        members_query = members_query.filter(Organization.id == selected_org_id)
+
+    # Filter by location
     if selected_location_id:
         location = Location.query.get_or_404(selected_location_id)
         members_query = members_query.join(Location).filter(Location.id == selected_location_id)
-    
+
     members = members_query.all()
 
     # Initialize matrix data
     matrix_data = []
 
     for member in members:
-        # Query for all attendance records for the member
+        # Build attendance query for the member
         attendance_query = Attendance.query.filter(Attendance.user_id == member.id, Attendance.location.has(organization_id=organization.id))
-        
-        # Filter by location if selected
+
+        # Apply filters
         if selected_location_id:
             attendance_query = attendance_query.filter(Attendance.location_id == selected_location_id)
-        
+
+        if selected_status:
+            attendance_query = attendance_query.filter(Attendance.status == selected_status)
+
+        if start_date:
+            start_date_obj = datetime.strptime(start_date, '%Y-%m-%d')
+            attendance_query = attendance_query.filter(Attendance.clock_in_time >= start_date_obj)
+
+        if end_date:
+            end_date_obj = datetime.strptime(end_date, '%Y-%m-%d')
+            attendance_query = attendance_query.filter(Attendance.clock_in_time <= end_date_obj)
+
+        # Get attendance records
         attendance_records = attendance_query.all()
 
         # Calculate early and late arrivals
@@ -227,7 +247,8 @@ def attendance_matrix():
             'late_count': late_count
         })
 
-    # Get all locations to allow filtering
+    # Get all organizations and locations to allow filtering
+    organizations = Organization.query.filter_by(user_id=current_user.id).all()
     locations = Location.query.filter_by(organization_id=organization.id).all()
 
     # Render the matrix view
@@ -235,11 +256,15 @@ def attendance_matrix():
         'matrix.html',
         organization=organization,
         members=matrix_data,
+        organizations=organizations,
         locations=locations,
+        selected_org_id=selected_org_id,
         selected_location_id=selected_location_id,
+        selected_status=selected_status,
+        start_date=start_date,
+        end_date=end_date,
         name=current_user.username,
-        is_admin=is_admin,
-        
+        is_admin=is_admin
     )
 
 
