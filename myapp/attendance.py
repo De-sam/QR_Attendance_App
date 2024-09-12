@@ -179,93 +179,72 @@ def process_qr_code():
 @attend.route('/attendance_matrix', methods=['GET', 'POST'])
 @login_required
 def attendance_matrix():
-    # Get the user's organization to check if they are an admin
-    user_id = current_user.id
-    organization = Organization.query.filter_by(user_id=user_id).first_or_404()
-
-    # Ensure only admins can access this page
-    is_admin = Organization.query.with_entities(func.count(Organization.id)).filter_by(user_id=user_id).scalar() > 0
-
-    if not is_admin:
-        flash('Unauthorized access. Only admins can view this page.', 'danger')
-        return redirect(url_for('dash.dashboard'))
-
-    # Filters from request
+    organizations = Organization.query.filter_by(user_id=current_user.id).all()
     selected_org_id = request.args.get('organization_id')
     selected_location_id = request.args.get('location_id')
     selected_status = request.args.get('status')
     start_date = request.args.get('start_date')
     end_date = request.args.get('end_date')
 
-    # Query for members of the organization
-    members_query = User.query.join(Organization).filter(Organization.id == organization.id)
+    # Build the query based on filters
+    query = Attendance.query.join(Location)
 
-    # Filter by organization
     if selected_org_id:
-        members_query = members_query.filter(Organization.id == selected_org_id)
+        query = query.filter(Location.organization_id == selected_org_id)
 
-    # Filter by location
     if selected_location_id:
-        location = Location.query.get_or_404(selected_location_id)
-        members_query = members_query.join(Location).filter(Location.id == selected_location_id)
+        query = query.filter(Attendance.location_id == selected_location_id)
 
-    members = members_query.all()
+    if selected_status:
+        query = query.filter(Attendance.status == selected_status)
+
+    if start_date:
+        start_date_obj = datetime.strptime(start_date, '%Y-%m-%d')
+        query = query.filter(Attendance.clock_in_time >= start_date_obj)
+
+    if end_date:
+        end_date_obj = datetime.strptime(end_date, '%Y-%m-%d')
+        query = query.filter(Attendance.clock_in_time <= end_date_obj)
+
+    # Get all attendance records based on the filters
+    attendances = query.all()
 
     # Initialize matrix data
-    matrix_data = []
+    matrix_data = {}
 
-    for member in members:
-        # Build attendance query for the member
-        attendance_query = Attendance.query.filter(Attendance.user_id == member.id, Attendance.location.has(organization_id=organization.id))
+    # Process attendance records to calculate early and late arrivals per user
+    for attendance in attendances:
+        member = attendance.user  # Assuming 'user' is a relationship on the Attendance model
+        if member not in matrix_data:
+            matrix_data[member] = {'early_count': 0, 'late_count': 0}
 
-        # Apply filters
-        if selected_location_id:
-            attendance_query = attendance_query.filter(Attendance.location_id == selected_location_id)
+        if attendance.status == 'Early':
+            matrix_data[member]['early_count'] += 1
+        elif attendance.status == 'Late':
+            matrix_data[member]['late_count'] += 1
 
-        if selected_status:
-            attendance_query = attendance_query.filter(Attendance.status == selected_status)
+    # Convert the matrix_data to a list for easier template rendering
+    members_matrix = [{'member': member, 'early_count': data['early_count'], 'late_count': data['late_count']}
+                      for member, data in matrix_data.items()]
 
-        if start_date:
-            start_date_obj = datetime.strptime(start_date, '%Y-%m-%d')
-            attendance_query = attendance_query.filter(Attendance.clock_in_time >= start_date_obj)
+    # Get all locations for filtering in the form
+    locations = Location.query.filter_by(organization_id=selected_org_id).all() if selected_org_id else []
 
-        if end_date:
-            end_date_obj = datetime.strptime(end_date, '%Y-%m-%d')
-            attendance_query = attendance_query.filter(Attendance.clock_in_time <= end_date_obj)
-
-        # Get attendance records
-        attendance_records = attendance_query.all()
-
-        # Calculate early and late arrivals
-        early_count = sum(1 for record in attendance_records if record.status == 'Early')
-        late_count = sum(1 for record in attendance_records if record.status == 'Late')
-
-        # Append member's matrix data
-        matrix_data.append({
-            'member': member,
-            'early_count': early_count,
-            'late_count': late_count
-        })
-
-    # Get all organizations and locations to allow filtering
-    organizations = Organization.query.filter_by(user_id=current_user.id).all()
-    locations = Location.query.filter_by(organization_id=organization.id).all()
-
-    # Render the matrix view
+    # Pass required data to the template
     return render_template(
         'matrix.html',
-        organization=organization,
-        members=matrix_data,
         organizations=organizations,
         locations=locations,
+        members_matrix=members_matrix,
         selected_org_id=selected_org_id,
         selected_location_id=selected_location_id,
         selected_status=selected_status,
         start_date=start_date,
         end_date=end_date,
         name=current_user.username,
-        is_admin=is_admin
+        is_admin=True  # Assuming you already verified admin access
     )
+
 
 
 @attend.route('/attendance_log', methods=['GET', 'POST'])

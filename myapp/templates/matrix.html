@@ -2,15 +2,15 @@
 {% block title %} Attendance Matrix {% endblock %}
 {% block content %}
 <div class="container mt-5">
-    <h2>Attendance Matrix for {{ organization.name }}</h2>
+    <h2>Attendance Matrix</h2>
 
-    <!-- Filter Form -->
-    <form method="get" class="mb-4">
+    <!-- Filter Form with auto-submit via JavaScript -->
+    <form id="filterForm" method="get" class="mb-4">
         <div class="row">
             <!-- Organization Filter -->
             <div class="col-md-3">
                 <label for="organization_id">Organization:</label>
-                <select name="organization_id" id="organization_id" class="form-select">
+                <select name="organization_id" id="organization_id" class="form-select" onchange="document.getElementById('filterForm').submit();">
                     <option value="">All Organizations</option>
                     {% for org in organizations %}
                         <option value="{{ org.id }}" {% if org.id == selected_org_id %}selected{% endif %}>{{ org.name }}</option>
@@ -18,10 +18,10 @@
                 </select>
             </div>
 
-            <!-- Location Filter (Alias instead of Name) -->
+            <!-- Location Filter -->
             <div class="col-md-3">
                 <label for="location_id">Location (Alias):</label>
-                <select name="location_id" id="location_id" class="form-select">
+                <select name="location_id" id="location_id" class="form-select" onchange="document.getElementById('filterForm').submit();">
                     <option value="">All Locations</option>
                     {% for location in locations %}
                         <option value="{{ location.id }}" {% if location.id == selected_location_id %}selected{% endif %}>{{ location.alias }}</option>
@@ -32,7 +32,7 @@
             <!-- Status Filter -->
             <div class="col-md-2">
                 <label for="status">Status:</label>
-                <select name="status" id="status" class="form-select">
+                <select name="status" id="status" class="form-select" onchange="document.getElementById('filterForm').submit();">
                     <option value="">All</option>
                     <option value="Early" {% if selected_status == 'Early' %}selected{% endif %}>Early</option>
                     <option value="Late" {% if selected_status == 'Late' %}selected{% endif %}>Late</option>
@@ -42,17 +42,12 @@
             <!-- Date Range Filter -->
             <div class="col-md-2">
                 <label for="start_date">Start Date:</label>
-                <input type="date" name="start_date" id="start_date" class="form-control" value="{{ start_date }}">
+                <input type="date" name="start_date" id="start_date" class="form-control" value="{{ start_date }}" onchange="document.getElementById('filterForm').submit();">
             </div>
 
             <div class="col-md-2">
                 <label for="end_date">End Date:</label>
-                <input type="date" name="end_date" id="end_date" class="form-control" value="{{ end_date }}">
-            </div>
-
-            <!-- Filter Button -->
-            <div class="col-md-12 mt-3">
-                <button type="submit" class="btn btn-primary">Filter</button>
+                <input type="date" name="end_date" id="end_date" class="form-control" value="{{ end_date }}" onchange="document.getElementById('filterForm').submit();">
             </div>
         </div>
     </form>
@@ -67,7 +62,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for data in members %}
+            {% for data in members_matrix %}
             <tr>
                 <td>{{ data.member.first_name }} {{ data.member.last_name }}</td>
                 <td>{{ data.early_count }}</td>
@@ -77,7 +72,7 @@
         </tbody>
     </table>
 
-    {% if not members %}
+    {% if not members_matrix %}
         <p>No attendance records found.</p>
     {% endif %}
 </div>
