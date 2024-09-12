@@ -94,6 +94,29 @@ def add_location(org_id):
         is_member=user_locations
     )
 
+@loc.route('/delete_location/<int:location_id>', methods=['POST'])
+@login_required
+def delete_location(location_id):
+    # Get the location by ID and ensure it exists
+    location = Location.query.get_or_404(location_id)
+    organization = Organization.query.get_or_404(location.organization_id)
+
+    # Security check to ensure the current user is authorized to delete the location
+    if organization.user_id != current_user.id:
+        flash('Unauthorized operation.', 'danger')
+        return redirect(url_for('dash.dashboard'))
+
+    try:
+        # Delete the location
+        db.session.delete(location)
+        db.session.commit()
+        flash('Location deleted successfully.', 'success')
+    except IntegrityError:
+        db.session.rollback()
+        flash('Error occurred while deleting the location.', 'danger')
+
+    return redirect(url_for('loc.manage_locations', org_id=organization.id))
+
 @loc.route('/manage_location/<int:org_id>')
 @login_required
 def manage_locations(org_id):
@@ -297,3 +320,4 @@ def regenerate_qr(location_id):
         is_admin=is_admin,
         is_member=user_locations
     )
+

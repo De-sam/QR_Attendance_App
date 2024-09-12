@@ -28,7 +28,7 @@ def create_org():
         name = request.form.get('name').strip().upper()  # Strip whitespace for consistent comparison
         user_id = current_user.id  # Static for demonstration; use authenticated user's ID in production
         
-
+    
         # Check if the organization name already exists
         existing_organization = Organization.query.filter_by(name=name).first()
         if existing_organization:
@@ -65,7 +65,7 @@ def create_org():
 
 def generate_organization_code(name):
     if len(name) < 3:
-        raise ValueError("Name must be at least two characters long")
+        raise ValueError("Name must be at least three characters long")
 
     # Extract the first, second, and last characters of the name
     first = name[0].upper()
