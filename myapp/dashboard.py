@@ -9,6 +9,8 @@ from .models import User,Organization,Location,QRCode,JoinRequest,Attendance
 
 dash = Blueprint("dash", __name__)
 
+
+
 @dash.route('/dashboard/')
 @login_required
 def dashboard():
@@ -127,3 +129,23 @@ def dashboard():
         late_count=late_count
     )
 
+@dash.route('/make_admin/<int:member_id>', methods=['POST'])
+@login_required
+def make_admin(member_id):
+    # Ensure only existing admins can promote others to admin
+    user_id = current_user.id
+    organization = Organization.query.filter_by(user_id=user_id).first()
+    
+    if not organization:
+        flash('You are not authorized to make users admin.', 'danger')
+        return redirect(url_for('dash.dashboard'))
+
+    # Find the member to be promoted
+    member = User.query.get_or_404(member_id)
+
+    # Add logic to promote member to admin (e.g., adding them to organization admin list)
+    member.is_admin = True
+    db.session.commit()
+    
+    flash(f'{member.username} has been successfully promoted to admin.', 'success')
+    return redirect(url_for('dash.dashboard'))
