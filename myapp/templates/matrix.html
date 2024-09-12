@@ -1,0 +1,46 @@
+{% extends "dashboard_base.html" %}
+{% block title %} Attendance Matrix {% endblock %}
+{% block content %}
+<div class="container mt-5"></div>
+    <h2>Attendance Matrix for {{ organization.name }}</h2>
+
+    <!-- Filter by Location -->
+    <form method="get" class="mb-4">
+        <label for="location_id">Filter by Location:</label>
+        <select name="location_id" id="location_id" class="form-select">
+            <option value="">All Locations</option>
+            {% for location in locations %}
+                <option value="{{ location.id }}" {% if location.id == selected_location_id %}selected{% endif %}>
+                    {{ location.name }}
+                </option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="btn btn-primary mt-2">Filter</button>
+    </form>
+
+    <!-- Attendance Matrix Table -->
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Member</th>
+                <th>Early Arrivals</th>
+                <th>Late Arrivals</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for data in members %}
+            <tr>
+                <td>{{ data.member.first_name }} {{ data.member.last_name }}</td>
+                <td>{{ data.early_count }}</td>
+                <td>{{ data.late_count }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if not members %}
+        <p>No attendance records found.</p>
+    {% endif %}
+</div>
+
+{% endblock %}

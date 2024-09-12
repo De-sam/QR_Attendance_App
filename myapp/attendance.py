@@ -176,6 +176,73 @@ def process_qr_code():
 
     return redirect(url_for('dash.dashboard'))
 
+@attend.route('/attendance_matrix', methods=['GET'])
+@login_required
+def attendance_matrix():
+    # Get the user's organization to check if they are an admin
+    user_id = current_user.id
+    organization = Organization.query.filter_by(user_id=user_id).first_or_404()
+
+    # Ensure only admins can access this page
+    is_admin = Organization.query.with_entities(func.count(Organization.id)).filter_by(user_id=user_id).scalar() > 0
+
+    if not is_admin:
+        flash('Unauthorized access. Only admins can view this page.', 'danger')
+        return redirect(url_for('dash.dashboard'))
+
+    # Get the selected location if provided
+    selected_location_id = request.args.get('location_id')
+
+    # Query for members of the organization
+    members_query = User.query.join(Organization).filter(Organization.id == organization.id)
+
+    # Filter by location if selected
+    if selected_location_id:
+        location = Location.query.get_or_404(selected_location_id)
+        members_query = members_query.join(Location).filter(Location.id == selected_location_id)
+    
+    members = members_query.all()
+
+    # Initialize matrix data
+    matrix_data = []
+
+    for member in members:
+        # Query for all attendance records for the member
+        attendance_query = Attendance.query.filter(Attendance.user_id == member.id, Attendance.location.has(organization_id=organization.id))
+        
+        # Filter by location if selected
+        if selected_location_id:
+            attendance_query = attendance_query.filter(Attendance.location_id == selected_location_id)
+        
+        attendance_records = attendance_query.all()
+
+        # Calculate early and late arrivals
+        early_count = sum(1 for record in attendance_records if record.status == 'Early')
+        late_count = sum(1 for record in attendance_records if record.status == 'Late')
+
+        # Append member's matrix data
+        matrix_data.append({
+            'member': member,
+            'early_count': early_count,
+            'late_count': late_count
+        })
+
+    # Get all locations to allow filtering
+    locations = Location.query.filter_by(organization_id=organization.id).all()
+
+    # Render the matrix view
+    return render_template(
+        'matrix.html',
+        organization=organization,
+        members=matrix_data,
+        locations=locations,
+        selected_location_id=selected_location_id,
+        name=current_user.username,
+        is_admin=is_admin,
+        
+    )
+
+
 @attend.route('/attendance_log', methods=['GET', 'POST'])
 @login_required
 def attendance_log():
