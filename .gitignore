@@ -1,5 +1,8 @@
 .virenv
 /virenv
 virenv
-
+QRcode
 .env
+virtenv
+/virtenv
+.virtenv
