@@ -179,17 +179,20 @@ def process_qr_code():
 @attend.route('/attendance_matrix', methods=['GET', 'POST'])
 @login_required
 def attendance_matrix():
+    # Get all organizations that belong to the current user
     organizations = Organization.query.filter_by(user_id=current_user.id).all()
+    
     selected_org_id = request.args.get('organization_id')
     selected_location_id = request.args.get('location_id')
     selected_status = request.args.get('status')
     start_date = request.args.get('start_date')
     end_date = request.args.get('end_date')
 
-    # Build the query based on filters
-    query = Attendance.query.join(Location)
+    # Ensure we only query for organizations the user belongs to
+    query = Attendance.query.join(Location).join(Organization).filter(Organization.user_id == current_user.id)
 
     if selected_org_id:
+        # If a specific organization is selected, filter by that organization
         query = query.filter(Location.organization_id == selected_org_id)
 
     if selected_location_id:
@@ -244,7 +247,6 @@ def attendance_matrix():
         name=current_user.username,
         is_admin=True  # Assuming you already verified admin access
     )
-
 
 
 @attend.route('/attendance_log', methods=['GET', 'POST'])
