@@ -4,60 +4,66 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pre-Login Page</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-mrH0sxk00pseDijJbAs2C5KwMVECFtW1nnV2iAXfaN00/jnpZcVZXpAqOZEKf6T5" crossorigin="anonymous">
     <style>
-        /* General Styles */
-        body, html {
+        /* Make sure the body and html fill the viewport */
+        html, body {
+            height: 100%;
             margin: 0;
             padding: 0;
-            height: 100%;
-            font-family: Arial, sans-serif;
         }
 
-        /* Container to center everything */
-        .container {
+        /* Container that holds the image and button */
+        .image-container {
+            position: relative;
             display: flex;
-            flex-direction: column;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
-            height: 100vh;
-            text-align: center;
+            height: 100vh; /* Full viewport height */
         }
 
-        /* Image styling */
-        .container img {
+        /* Style for the image */
+        .image-container img {
+            width: 100%; /* Make image responsive */
             max-width: 100%;
             height: auto;
-            margin-top: 20px;
+            border-radius: 15px; /* Add rounded corners */
         }
 
-        /* Get Started button styling */
+        /* Button styling, placed over the image */
         .get-started-btn {
-            margin-bottom: 50px;
+            position: absolute;
+            z-index: 2;
+            bottom: 30px;
             padding: 15px 30px;
-            font-size: 18px;
-            background-color: #007BFF;
+            font-size: 20px;
+            background-color: #dc3545; /* Red color */
             color: white;
             border: none;
             border-radius: 5px;
-            cursor: pointer;
             text-transform: uppercase;
+            cursor: pointer;
             transition: background-color 0.3s;
         }
 
         .get-started-btn:hover {
-            background-color: #0056b3;
+            background-color: #b02a37; /* Darker red on hover */
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <!-- Image at the top -->
-    <img src="https://img.freepik.com/premium-vector/time-management-concept_118813-5166.jpg?w=1380" alt="Welcome Image">
+<div class="image-container">
+    <!-- Displaying the image directly -->
+    <img src="https://img.freepik.com/premium-vector/time-management-concept_118813-5166.jpg?w=1380" alt="Time Management Concept">
     
     <!-- Get Started Button -->
     <button class="get-started-btn" onclick="window.location.href='{{ url_for('auth.login') }}'">Get Started</button>
 </div>
+
+<!-- Bootstrap JS and dependencies -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqjHFHd1d7LwOtOka5bC47BM9U9yuOx4tJfA4Ql6FELbT96F50RXoHKRMp6g" crossorigin="anonymous"></script>
 
 </body>
 </html>
