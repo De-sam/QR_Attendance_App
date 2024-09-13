@@ -6,6 +6,9 @@ from datetime import datetime, timedelta
 import pytz
 import json
 from .models import User,Organization,Location,QRCode,JoinRequest,Attendance
+from . import db
+from myapp import flash
+
 
 dash = Blueprint("dash", __name__)
 
