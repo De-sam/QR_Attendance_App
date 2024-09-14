@@ -155,9 +155,10 @@ def generate_qr(location_id):
             f"Name: {location.name}, "
             f"Address: {location.address}, "
             f"Alias: {location.alias}, "
+            f"Organization: {organization.name}, "  # Include the organization name
             f"Latitude: {location.latitude}, "
             f"Longitude: {location.longitude}, "
-            f"Tolerance: 100"  # Tolerance in meters
+            f"Tolerance: 100"
         )
 
         # Generate QR code
@@ -182,19 +183,36 @@ def generate_qr(location_id):
             draw = ImageDraw.Draw(qr_img)
             font = ImageFont.truetype('myapp/static/fonts/SedanSC-Regular.ttf', size=20)
 
-            # Measure text size for accurate placement
-            text_width, _, _, text_height = draw.textbbox((0, 0), location.alias, font=font)
-            text_x = (qr_img.width - text_width) // 2
-            text_y = qr_img.height - text_height - 10
+            # Prepare the texts
+            org_text = organization.name
+            alias_text = location.alias
+            
+            # Measure text sizes
+            org_text_width, _, _, org_text_height = draw.textbbox((0, 0), org_text, font=font)
+            alias_text_width, _, _, alias_text_height = draw.textbbox((0, 0), alias_text, font=font)
 
-            # Draw the alias text on the QR code image
-            draw.text((text_x, text_y), location.alias, fill='black', font=font)
+            # Calculate positions for placing the organization name at the top
+            padding = 10  # Space from the top and bottom of the image
+
+            # Place the organization name at the top, centered
+            text_x_org = (qr_img.width - org_text_width) // 2  # Center the organization name
+            text_y_org = padding  # Position the organization name at the top
+
+            # Place the alias at the bottom, centered
+            text_x_alias = (qr_img.width - alias_text_width) // 2  # Center the alias at the bottom
+            text_y_alias = qr_img.height - alias_text_height - padding  # Position alias near the bottom
+
+            # Draw the organization name at the top
+            draw.text((text_x_org, text_y_org), org_text, fill='black', font=font)
+            # Draw the alias at the bottom
+            draw.text((text_x_alias, text_y_alias), alias_text, fill='black', font=font)
 
             # Save the modified QR code image to a new BytesIO buffer
             qr_img_bytes = BytesIO()
             qr_img.save(qr_img_bytes, format='PNG')
             qr_img_bytes.seek(0)
             qr_img_base64 = base64.b64encode(qr_img_bytes.read()).decode('utf-8')
+    
     user_id = current_user.id  # Static for demonstration; use authenticated user's ID in production
     is_admin = Organization.query.with_entities(func.count(Organization.id)).filter_by(user_id=user_id).scalar() > 0
     user_locations = current_user.locations
@@ -208,6 +226,8 @@ def generate_qr(location_id):
         is_admin=is_admin,
         is_member=user_locations
     )
+
+
 
 @loc.route('/set_deadline/<int:location_id>', methods=['GET', 'POST'])
 @login_required
