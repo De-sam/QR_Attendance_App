@@ -289,7 +289,7 @@ def regenerate_qr(location_id):
             f"Alias: {location.alias}, "
             f"Latitude: {location.latitude}, "
             f"Longitude: {location.longitude}, "
-            f"Tolerance: 100"  # Tolerance in meters
+            f"Tolerance: 300"  # Tolerance in meters
         )
 
         # Generate QR code

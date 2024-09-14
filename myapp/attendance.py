@@ -109,23 +109,23 @@ def process_qr_code():
     print(f"Current time in user's timezone: {current_time}")
 
     # Check if the user is within 100 meters of the coordinates in the QR code
-    # import math
-    # def haversine(lat1, lon1, lat2, lon2):
-    #     R = 6371000  # Radius of the Earth in meters
-    #     phi1 = math.radians(lat1)
-    #     phi2 = math.radians(lat2)
-    #     delta_phi = math.radians(lat2 - lat1)
-    #     delta_lambda = math.radians(lon2 - lon1)
-    #     a = math.sin(delta_phi / 2) ** 2 + math.cos(phi1) * math.cos(phi2) * math.sin(delta_lambda / 2) ** 2
-    #     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-    #     return R * c
+    import math
+    def haversine(lat1, lon1, lat2, lon2):
+        R = 6371000  # Radius of the Earth in meters
+        phi1 = math.radians(lat1)
+        phi2 = math.radians(lat2)
+        delta_phi = math.radians(lat2 - lat1)
+        delta_lambda = math.radians(lon2 - lon1)
+        a = math.sin(delta_phi / 2) ** 2 + math.cos(phi1) * math.cos(phi2) * math.sin(delta_lambda / 2) ** 2
+        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+        return R * c
 
-    # distance = haversine(lat, lng, location.latitude, location.longitude)
-    # if distance > 100:
-    #     flash(f'You are not within the required range of the location. Distance: {distance:.2f} meters', 'danger')
-    #     return redirect(url_for('attend.clock_in'))
-    # else:
-    #     flash(f'Within the required range of the location. Distance: {distance:.2f} meters', 'info')
+    distance = haversine(lat, lng, location.latitude, location.longitude)
+    if distance > 300:
+        flash(f'You are not within the required range of the location. Distance: {distance:.2f} meters', 'danger')
+        return redirect(url_for('attend.clock_in'))
+    else:
+        flash(f'Within the required range of the location. Distance: {distance:.2f} meters', 'info')
 
     # Check deadline and set status
     c_time = current_time
